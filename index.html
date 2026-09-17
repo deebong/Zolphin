@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOLPHIN | Azure Cloud Infrastructure & Engineering</title>
+    <meta name="description" content="Secure, scalable and production-ready Azure infrastructure designed around the workload. Azure architecture, networking, security, Terraform, DevOps, and AKS.">
+    
+    <link rel="canonical" href="https://zolphin.com/">
+    <meta property="og:title" content="ZOLPHIN | Azure Cloud Infrastructure & Engineering">
+    <meta property="og:description" content="Secure, scalable and production-ready Azure infrastructure designed around the workload.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zolphin.com/">
+    
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <div class="nav-wrapper">
+        <nav class="main-nav" aria-label="Primary Navigation">
+            <a href="/" class="brand">
+                <div class="brand-icon"></div>
+                <div>
+                    ZOLPHIN
+                    <div class="brand-descriptor">AZURE CLOUD INFRASTRUCTURE</div>
+                </div>
+            </a>
+
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav-links">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+
+            <ul class="main-nav-links" id="main-nav-links">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#architectures">Architectures</a></li>
+                <li><a href="#approach">Approach</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Fiverr</a>
+                <a href="#contact" class="btn btn-primary">Start a Project</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 01 HERO -->
+    <header class="section hero reveal">
+        <div class="container hero-content">
+            <span class="eyebrow">Azure Cloud Infrastructure & Engineering</span>
+            <h1 class="font-display">
+                Azure Infrastructure<br>
+                Built For<br>
+                Production.
+            </h1>
+            <p class="subtitle">
+                We design and implement secure, scalable Azure infrastructure for production workloads — using the simplest architecture that satisfies the real requirements.
+            </p>
+            <p style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 3rem;">
+                Architecture &bull; Networking &bull; Security &bull; Terraform &bull; DevOps &bull; AKS
+            </p>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="#contact" class="btn btn-accent" style="padding: 1rem 2rem; font-size: 0.875rem;">Start a Project</a>
+                <a href="#architectures" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 0.875rem;">Explore Architectures</a>
+            </div>
+
+            <!-- Conceptual Architecture Visual -->
+            <div class="hero-visual reveal">
+                <div class="visual-header">
+                    <div class="dot-group">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
+                    <span class="visual-title">Conceptual Architecture</span>
+                </div>
+                <div class="visual-body">
+                    <div class="grid-bg"></div>
+                    <svg viewBox="0 0 1000 450" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; position: relative; z-index: 10;">
+                        <!-- DevOps Flow -->
+                        <rect x="50" y="50" width="160" height="350" rx="8" fill="#F7F8F6" stroke="rgba(16,20,27,0.08)" stroke-width="2" />
+                        <text x="130" y="80" fill="#10141B" font-family="Inter" font-weight="600" font-size="14" text-anchor="middle">Azure DevOps</text>
+                        <text x="130" y="100" fill="#5F6672" font-family="monospace" font-size="10" text-anchor="middle">+ Terraform</text>
+                        
+                        <rect x="70" y="130" width="120" height="30" rx="4" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" />
+                        <text x="130" y="150" fill="#5F6672" font-family="Inter" font-size="10" text-anchor="middle">Code / PR</text>
+                        
+                        <rect x="70" y="190" width="120" height="30" rx="4" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" />
+                        <text x="130" y="210" fill="#5F6672" font-family="Inter" font-size="10" text-anchor="middle">Terraform Plan</text>
+
+                        <rect x="70" y="250" width="120" height="30" rx="4" fill="#FFFFFF" stroke="#4DA3FF" stroke-width="2" />
+                        <text x="130" y="270" fill="#4DA3FF" font-family="Inter" font-weight="600" font-size="10" text-anchor="middle">Approval / Apply</text>
+
+                        <path d="M 130 160 L 130 190 M 130 220 L 130 250" stroke="rgba(16,20,27,0.15)" stroke-width="2" stroke-dasharray="2 2"/>
+                        
+                        <path d="M 210 265 L 320 265" stroke="#4DA3FF" stroke-width="2" stroke-dasharray="4 4"/>
+                        <circle cx="320" cy="265" r="4" fill="#4DA3FF"/>
+
+                        <!-- Azure Environment -->
+                        <rect x="350" y="50" width="600" height="350" rx="12" fill="none" stroke="rgba(16,20,27,0.08)" stroke-width="2" stroke-dasharray="6 6"/>
+                        <text x="370" y="80" fill="#10141B" font-family="Inter" font-weight="600" font-size="14">Azure Cloud</text>
+                        
+                        <!-- Internet & Gateway -->
+                        <rect x="400" y="120" width="140" height="40" rx="6" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
+                        <text x="470" y="145" fill="#10141B" font-family="Inter" font-weight="600" font-size="12" text-anchor="middle">App Gateway + WAF</text>
+                        <text x="470" y="100" fill="#5F6672" font-family="monospace" font-size="10" text-anchor="middle">INTERNET TRAFFIC ↓</text>
+                        
+                        <!-- Workload -->
+                        <rect x="620" y="120" width="280" height="80" rx="6" fill="rgba(77,163,255,0.05)" stroke="#4DA3FF" stroke-width="1"/>
+                        <text x="760" y="145" fill="#10141B" font-family="Inter" font-weight="600" font-size="12" text-anchor="middle">Application Workload</text>
+                        <text x="760" y="170" fill="#5F6672" font-family="monospace" font-size="10" text-anchor="middle">App Service / Container Apps / AKS</text>
+
+                        <path d="M 540 140 L 620 140" stroke="#10141B" stroke-width="2"/>
+                        <circle cx="620" cy="140" r="3" fill="#10141B"/>
+
+                        <!-- Data & Security -->
+                        <rect x="620" y="240" width="130" height="50" rx="6" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
+                        <text x="685" y="265" fill="#10141B" font-family="Inter" font-weight="600" font-size="12" text-anchor="middle">Azure SQL</text>
+                        <text x="685" y="280" fill="#5F6672" font-family="monospace" font-size="9" text-anchor="middle">Private Endpoint</text>
+
+                        <rect x="770" y="240" width="130" height="50" rx="6" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
+                        <text x="835" y="265" fill="#10141B" font-family="Inter" font-weight="600" font-size="12" text-anchor="middle">Key Vault</text>
+                        <text x="835" y="280" fill="#5F6672" font-family="monospace" font-size="9" text-anchor="middle">Managed Identity</text>
+
+                        <path d="M 685 200 L 685 240 M 835 200 L 835 240" stroke="rgba(16,20,27,0.15)" stroke-width="2" stroke-dasharray="2 2"/>
+
+                        <!-- Monitoring -->
+                        <rect x="400" y="320" width="500" height="40" rx="6" fill="#10141B" />
+                        <text x="650" y="345" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="12" text-anchor="middle">Azure Monitor / Log Analytics</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 02 WHAT WE ENGINEER -->
+    <section id="services" class="section reveal">
+        <div class="container">
+            <span class="eyebrow">WHAT WE ENGINEER</span>
+            <h2 class="font-display">
+                FROM CLOUD<br>
+                REQUIREMENTS<br>
+                TO PRODUCTION.
+            </h2>
+            <p class="subtitle">
+                Zolphin designs the infrastructure, networking, security and deployment foundations required to run production workloads reliably on Azure.
+            </p>
+
+            <div class="service-grid">
+                <div class="service-item">
+                    <span class="service-num">01</span>
+                    <h3 class="font-display" style="font-size: 1.5rem;">Azure Architecture</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">Landing zones, workload architecture, environment design and architectural decisions.</p>
+                </div>
+                <div class="service-item">
+                    <span class="service-num">02</span>
+                    <h3 class="font-display" style="font-size: 1.5rem;">Networking</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">VNets, subnets, NSGs, routing, private endpoints, VPN, ExpressRoute and secure connectivity.</p>
+                </div>
+                <div class="service-item">
+                    <span class="service-num">03</span>
+                    <h3 class="font-display" style="font-size: 1.5rem;">Security & Identity</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">Entra ID, RBAC, Managed Identity, Key Vault, private access and least-privilege design.</p>
+                </div>
+                <div class="service-item">
+                    <span class="service-num">04</span>
+                    <h3 class="font-display" style="font-size: 1.5rem;">Infrastructure as Code</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">Terraform modules, environment configuration and repeatable infrastructure provisioning.</p>
+                </div>
+                <div class="service-item">
+                    <span class="service-num">05</span>
+                    <h3 class="font-display" style="font-size: 1.5rem;">DevOps & Platform Eng.</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">Azure DevOps, CI/CD, deployment workflows, approvals and environment controls.</p>
+                </div>
+                <div class="service-item">
+                    <span class="service-num">06</span>
+                    <h3 class="font-display" style="font-size: 1.5rem;">Containers & Platforms</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">App Service, Container Apps, AKS and workload-specific platform selection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 03 ARCHITECTURE APPROACH -->
+    <section id="approach" class="section reveal" style="background-color: #fff; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+        <div class="container approach-container">
+            <div>
+                <h2 class="font-display" style="margin-bottom: 2rem;">
+                    ARCHITECTURE<br>
+                    BEFORE<br>
+                    IMPLEMENTATION.
+                </h2>
+                <p class="subtitle" style="margin-bottom: 3rem;">
+                    We start with the workload, constraints and operational requirements — then choose the Azure services that actually solve the problem.
+                </p>
+                <div class="approach-steps">
+                    <div class="step-item">
+                        <div class="step-number">01</div>
+                        <div class="step-text">Understand the workload</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">02</div>
+                        <div class="step-text">Define security & connectivity</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">03</div>
+                        <div class="step-text">Select the right platform</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">04</div>
+                        <div class="step-text">Automate with Terraform</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">05</div>
+                        <div class="step-text">Deploy through controlled CI/CD</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">06</div>
+                        <div class="step-text">Monitor, validate and evolve</div>
+                    </div>
+                </div>
+            </div>
+            <div style="background: var(--bg-main); border-radius: 24px; padding: 3rem; border: 1px solid var(--border-light); text-align: center; position: relative; overflow: hidden;">
+                <!-- Abstract process visual -->
+                <svg viewBox="0 0 300 500" width="100%" height="100%">
+                    <rect x="50" y="50" width="200" height="60" rx="8" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                    <text x="150" y="85" fill="#10141B" font-family="monospace" font-size="12" text-anchor="middle">REQUIREMENTS</text>
+
+                    <path d="M 150 110 L 150 150" stroke="#4DA3FF" stroke-width="2"/>
+                    <circle cx="150" cy="150" r="4" fill="#4DA3FF"/>
+
+                    <rect x="50" y="150" width="200" height="60" rx="8" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                    <text x="150" y="185" fill="#10141B" font-family="monospace" font-size="12" text-anchor="middle">ARCHITECTURE</text>
+
+                    <path d="M 150 210 L 150 250" stroke="#4DA3FF" stroke-width="2"/>
+                    <circle cx="150" cy="250" r="4" fill="#4DA3FF"/>
+
+                    <rect x="50" y="250" width="200" height="60" rx="8" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                    <text x="150" y="285" fill="#10141B" font-family="monospace" font-size="12" text-anchor="middle">INFRASTRUCTURE</text>
+
+                    <path d="M 150 310 L 150 350" stroke="#4DA3FF" stroke-width="2"/>
+                    <circle cx="150" cy="350" r="4" fill="#4DA3FF"/>
+
+                    <rect x="50" y="350" width="200" height="60" rx="8" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                    <text x="150" y="385" fill="#10141B" font-family="monospace" font-size="12" text-anchor="middle">DEPLOYMENT & OPS</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04 REFERENCE ARCHITECTURES -->
+    <section id="architectures" class="section reveal">
+        <div class="container">
+            <span class="eyebrow">REFERENCE ARCHITECTURES</span>
+            <h2 class="font-display">
+                ARCHITECTURES<br>
+                BUILT AROUND<br>
+                THE WORKLOAD.
+            </h2>
+            <p class="subtitle" style="margin-bottom: 1rem;">
+                Explore representative Azure architectures showing how Zolphin approaches security, networking, infrastructure automation, application platforms and operational resilience.
+            </p>
+            <p style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); background: #fff; display: inline-block; padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid var(--border-light);">
+                <strong>NOTICE:</strong> These examples illustrate our engineering approach and are not presented as client engagements.
+            </p>
+
+            <div class="ref-grid">
+                <!-- Card 01 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>01</span>
+                        <span>APPLICATION PLATFORM</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 150" width="80%">
+                            <rect x="20" y="20" width="160" height="110" rx="8" fill="none" stroke="rgba(16,20,27,0.1)" stroke-dasharray="4 4"/>
+                            <rect x="40" y="40" width="120" height="30" rx="4" fill="#fff" stroke="#4DA3FF"/>
+                            <rect x="40" y="80" width="50" height="30" rx="4" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                            <rect x="110" y="80" width="50" height="30" rx="4" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                            <path d="M 65 70 L 65 80 M 135 70 L 135 80" stroke="#4DA3FF" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Production SaaS Platform</h3>
+                    <p class="ref-desc">A secure production foundation for SaaS workloads with controlled ingress, private data connectivity, managed identity, Terraform, CI/CD and operational monitoring.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">App Gateway</span><span class="ref-tag">Azure SQL</span><span class="ref-tag">Key Vault</span>
+                    </div>
+                    <a href="case-studies/production-saas.html" class="ref-cta">
+                        EXPLORE ARCHITECTURE
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Card 02 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>02</span>
+                        <span>ENTERPRISE CLOUD</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 150" width="80%">
+                            <rect x="70" y="20" width="60" height="110" rx="8" fill="#fff" stroke="#4DA3FF" stroke-width="2"/>
+                            <rect x="20" y="55" width="40" height="40" rx="8" fill="none" stroke="rgba(16,20,27,0.1)"/>
+                            <rect x="140" y="55" width="40" height="40" rx="8" fill="none" stroke="rgba(16,20,27,0.1)"/>
+                            <path d="M 60 75 L 70 75 M 130 75 L 140 75" stroke="#4DA3FF" stroke-width="2" stroke-dasharray="2 2"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Azure Landing Zone</h3>
+                    <p class="ref-desc">A structured Azure foundation for organizations that need governance, shared connectivity, security controls and isolated workload environments.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">Hub & Spoke</span><span class="ref-tag">Azure Firewall</span><span class="ref-tag">Entra ID</span>
+                    </div>
+                    <a href="#architectures" class="ref-cta">
+                        VIEW ARCHITECTURE
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Card 03 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>03</span>
+                        <span>INFRASTRUCTURE AS CODE</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 150" width="80%">
+                            <rect x="20" y="60" width="40" height="30" rx="4" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                            <rect x="80" y="60" width="40" height="30" rx="4" fill="#fff" stroke="#4DA3FF"/>
+                            <rect x="140" y="60" width="40" height="30" rx="4" fill="#10141B"/>
+                            <path d="M 60 75 L 80 75 M 120 75 L 140 75" stroke="rgba(16,20,27,0.1)" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Terraform + Azure DevOps</h3>
+                    <p class="ref-desc">Repeatable Azure infrastructure with reusable Terraform modules, environment separation, plan/apply workflows, approvals and controlled deployments.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">Terraform</span><span class="ref-tag">CI/CD</span><span class="ref-tag">Env Controls</span>
+                    </div>
+                    <a href="#architectures" class="ref-cta">
+                        EXPLORE ARCHITECTURE
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Card 04 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>04</span>
+                        <span>CONTAINER PLATFORM</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 150" width="80%">
+                            <rect x="20" y="20" width="160" height="110" rx="8" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                            <rect x="40" y="50" width="120" height="60" rx="4" fill="rgba(77,163,255,0.05)" stroke="#4DA3FF" stroke-dasharray="4 4"/>
+                            <circle cx="70" cy="80" r="10" fill="#fff" stroke="#4DA3FF"/>
+                            <circle cx="100" cy="80" r="10" fill="#fff" stroke="#4DA3FF"/>
+                            <circle cx="130" cy="80" r="10" fill="#fff" stroke="#4DA3FF"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Production AKS Architecture</h3>
+                    <p class="ref-desc">A Kubernetes-oriented Azure architecture for workloads that genuinely require advanced orchestration, networking and container platform control.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">AKS</span><span class="ref-tag">VNet</span><span class="ref-tag">Managed Identity</span>
+                    </div>
+                    <a href="#architectures" class="ref-cta">
+                        EXPLORE ARCHITECTURE
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Card 05 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>05</span>
+                        <span>CLOUD MIGRATION</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 150" width="80%">
+                            <rect x="20" y="40" width="50" height="70" rx="4" fill="#fff" stroke="rgba(16,20,27,0.1)"/>
+                            <rect x="130" y="40" width="50" height="70" rx="4" fill="#fff" stroke="#4DA3FF"/>
+                            <path d="M 70 75 L 130 75" stroke="#10141B" stroke-width="2" stroke-dasharray="4 4"/>
+                            <path d="M 120 65 L 130 75 L 120 85" fill="none" stroke="#10141B" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">On-Premises to Azure</h3>
+                    <p class="ref-desc">A migration architecture covering connectivity, workload assessment, target architecture, data movement, security, cutover and operational readiness.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">ExpressRoute</span><span class="ref-tag">Migration</span><span class="ref-tag">DR</span>
+                    </div>
+                    <a href="#architectures" class="ref-cta">
+                        EXPLORE ARCHITECTURE
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Card 06 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>06</span>
+                        <span>SECURITY & RESILIENCE</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 150" width="80%">
+                            <circle cx="100" cy="75" r="40" fill="none" stroke="rgba(16,20,27,0.1)" stroke-width="2"/>
+                            <circle cx="100" cy="75" r="30" fill="none" stroke="#4DA3FF" stroke-width="2"/>
+                            <rect x="90" y="65" width="20" height="20" rx="2" fill="#10141B"/>
+                            <path d="M 95 65 V 60 A 5 5 0 0 1 105 60 V 65" fill="none" stroke="#10141B" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Secure & Resilient Foundation</h3>
+                    <p class="ref-desc">An architecture focused on private connectivity, identity, secrets, monitoring, backup, disaster recovery and operational resilience.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">Key Vault</span><span class="ref-tag">Private Access</span><span class="ref-tag">RTO / RPO</span>
+                    </div>
+                    <a href="#architectures" class="ref-cta">
+                        EXPLORE ARCHITECTURE
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 05 ENGINEERING OUTCOMES -->
+    <section class="section reveal">
+        <div class="container">
+            <span class="eyebrow">ENGINEERING OUTCOMES</span>
+            <h2 class="font-display">
+                INFRASTRUCTURE<br>
+                THAT STAYS<br>
+                MANAGEABLE.
+            </h2>
+            
+            <div class="outcomes-grid">
+                <div class="outcome-item">
+                    <h3 class="outcome-title">SECURE BY DESIGN</h3>
+                    <p class="outcome-desc">Private connectivity, identity controls and managed secrets.</p>
+                </div>
+                <div class="outcome-item">
+                    <h3 class="outcome-title">REPEATABLE</h3>
+                    <p class="outcome-desc">Terraform-based infrastructure reduces configuration drift.</p>
+                </div>
+                <div class="outcome-item">
+                    <h3 class="outcome-title">OBSERVABLE</h3>
+                    <p class="outcome-desc">Azure Monitor, Log Analytics and Application Insights provide operational visibility.</p>
+                </div>
+                <div class="outcome-item">
+                    <h3 class="outcome-title">RESILIENT</h3>
+                    <p class="outcome-desc">Architecture accounts for failure, recovery and workload-specific RTO/RPO requirements.</p>
+                </div>
+                <div class="outcome-item">
+                    <h3 class="outcome-title">SCALABLE</h3>
+                    <p class="outcome-desc">Infrastructure evolves with workload growth instead of requiring unnecessary redesign.</p>
+                </div>
+                <div class="outcome-item">
+                    <h3 class="outcome-title">COST-AWARE</h3>
+                    <p class="outcome-desc">Services and architecture are selected according to actual workload requirements.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 06 ARCHITECTURE PHILOSOPHY -->
+    <section class="philosophy-section reveal">
+        <h2 class="philosophy-statement">
+            THE GOAL IS NOT<br>MAXIMUM COMPLEXITY.<br>THE GOAL IS<br><span style="color: var(--accent);">THE RIGHT ARCHITECTURE.</span>
+        </h2>
+        <p class="philosophy-sub">
+            We do not add services simply because they are available. The architecture should solve the requirement.
+        </p>
+    </section>
+
+    <!-- 07 HOW WE WORK -->
+    <section class="section reveal" style="background: #fff; border-bottom: 1px solid var(--border-light);">
+        <div class="container">
+            <span class="eyebrow">WORKFLOW</span>
+            <h2 class="font-display" style="margin-bottom: 0;">HOW WE WORK.</h2>
+            
+            <div class="workflow-grid">
+                <div class="workflow-item">
+                    <span class="workflow-num">01 / DISCOVER</span>
+                    <p style="color: var(--text-secondary);">Understand workload, requirements, constraints and risks.</p>
+                </div>
+                <div class="workflow-item">
+                    <span class="workflow-num">02 / DESIGN</span>
+                    <p style="color: var(--text-secondary);">Define architecture, networking, security and platform decisions.</p>
+                </div>
+                <div class="workflow-item">
+                    <span class="workflow-num">03 / AUTOMATE</span>
+                    <p style="color: var(--text-secondary);">Build infrastructure with Terraform and environment-specific configuration.</p>
+                </div>
+                <div class="workflow-item">
+                    <span class="workflow-num">04 / DEPLOY</span>
+                    <p style="color: var(--text-secondary);">Use controlled CI/CD workflows with validation and approvals.</p>
+                </div>
+                <div class="workflow-item">
+                    <span class="workflow-num">05 / OPERATE</span>
+                    <p style="color: var(--text-secondary);">Monitor health, logs, performance, reliability and cost.</p>
+                </div>
+                <div class="workflow-item">
+                    <span class="workflow-num">06 / EVOLVE</span>
+                    <p style="color: var(--text-secondary);">Scale and adapt the architecture as the workload changes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 08 ABOUT ZOLPHIN -->
+    <section id="about" class="section reveal">
+        <div class="container">
+            <div style="max-width: 800px;">
+                <span class="eyebrow">ABOUT ZOLPHIN</span>
+                <h2 class="font-display">
+                    ENGINEERING-LED.<br>
+                    AZURE-FIRST.
+                </h2>
+                <p class="subtitle" style="color: var(--text-primary);">
+                    Zolphin is an Azure cloud infrastructure and engineering practice focused on designing and implementing secure, scalable and production-ready cloud environments.
+                </p>
+                <p class="subtitle">
+                    Technical leadership comes from an Azure Solutions Architect with 15+ years of IT infrastructure experience.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 09 TECHNOLOGY STACK -->
+    <section class="section reveal" style="padding-top: 0;">
+        <div class="container border-t" style="border-top: 1px solid var(--border-light); padding-top: 6rem;">
+            <h2 class="font-display">TECHNOLOGY STACK</h2>
+            <div class="tech-grid">
+                <div class="tech-group">
+                    <h4>Cloud & Compute</h4>
+                    <ul>
+                        <li>Microsoft Azure</li>
+                        <li>App Service</li>
+                        <li>Container Apps</li>
+                        <li>AKS</li>
+                        <li>Virtual Machines</li>
+                    </ul>
+                </div>
+                <div class="tech-group">
+                    <h4>Architecture</h4>
+                    <ul>
+                        <li>Azure Landing Zones</li>
+                        <li>Hub & Spoke</li>
+                        <li>VNets</li>
+                        <li>App Gateway</li>
+                        <li>Azure Front Door</li>
+                    </ul>
+                </div>
+                <div class="tech-group">
+                    <h4>Security & Data</h4>
+                    <ul>
+                        <li>Entra ID</li>
+                        <li>Managed Identity</li>
+                        <li>Key Vault</li>
+                        <li>Private Endpoints</li>
+                        <li>Azure SQL</li>
+                    </ul>
+                </div>
+                <div class="tech-group">
+                    <h4>Ops & Automation</h4>
+                    <ul>
+                        <li>Terraform</li>
+                        <li>Azure DevOps</li>
+                        <li>Azure Monitor</li>
+                        <li>Log Analytics</li>
+                        <li>Application Insights</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10 FAQ -->
+    <section class="section reveal" style="background: #fff; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+        <div class="container">
+            <div class="text-center">
+                <span class="eyebrow">FAQ</span>
+                <h2 class="font-display">COMMON QUESTIONS</h2>
+            </div>
+            
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>Why Azure?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Azure provides an enterprise-grade ecosystem with excellent integrated security, identity (Entra ID), and hybrid capabilities. We focus exclusively on Azure to deliver deep, specialized architectural expertise.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>How do you choose between App Service, Container Apps and AKS?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        We default to App Service for standard web workloads. Container Apps is used for containerized workloads not requiring Kubernetes control. We only recommend AKS when the workload genuinely requires advanced orchestration and Kubernetes-native capabilities.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>Do you use Terraform?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Yes. We strongly advocate for Infrastructure as Code. We use Terraform with reusable modules to ensure environments are consistent, version-controlled, and repeatable.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>Can you work with existing Azure environments?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Yes. We frequently assess existing environments, identify architectural gaps, and implement improvements with minimal impact to active workloads.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>How do you approach disaster recovery?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Disaster recovery is an architecture decision based entirely on the workload's specific RTO (Recovery Time Objective) and RPO (Recovery Point Objective) requirements.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11 CONTACT -->
+    <section id="contact" class="section reveal" style="padding-bottom: 12rem;">
+        <div class="container">
+            <div class="cta-box">
+                <span class="eyebrow">START A PROJECT</span>
+                <h2 class="font-display" style="font-size: clamp(2.5rem, 5vw, 4rem);">
+                    HAVE AN AZURE<br>
+                    ARCHITECTURE<br>
+                    TO SOLVE?
+                </h2>
+                <p class="subtitle" style="margin: 0 auto;">
+                    Tell us what you are building, migrating or trying to improve. We can start with the architecture, infrastructure requirements and implementation path.
+                </p>
+                <div class="cta-actions">
+                    <!-- Configurable Placeholders where appropriate -->
+                    <a href="mailto:hello@zolphin.com" class="btn btn-primary" style="padding: 1rem 2.5rem;">START A CONVERSATION</a>
+                    <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 1rem 2.5rem;">VIEW FIVERR PROFILE</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12 FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">ZOLPHIN</div>
+                    <p class="footer-desc">Azure Cloud Infrastructure & Engineering</p>
+                </div>
+                <div class="footer-col">
+                    <h5>Navigation</h5>
+                    <ul>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#architectures">Architectures</a></li>
+                        <li><a href="#approach">Approach</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Connect</h5>
+                    <ul>
+                        <li><a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer">Fiverr</a></li>
+                        <!-- Placeholders -->
+                        <li><a href="https://github.com/">GitHub</a></li>
+                        <li><a href="https://linkedin.com/">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Zolphin. All rights reserved.</p>
+                <p>Engineered for Production.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
