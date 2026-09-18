@@ -99,7 +99,7 @@ ul { list-style: none; }
   pointer-events: auto; background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-light); box-shadow: var(--shadow-md);
-  border-radius: 100px; padding: 0.5rem 0.75rem 0.5rem 1.5rem;
+  border-radius: 8px; padding: 0.5rem 0.75rem 0.5rem 1.5rem;
   display: flex; align-items: center; gap: 3rem;
   width: 100%; max-width: 1200px; transition: all 0.3s ease;
 }
@@ -283,8 +283,8 @@ ul { list-style: none; }
 .workflow-step:hover .workflow-title { color: var(--accent); }
 
 /* About Zolphin */
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.about-profile { background: #fff; padding: 3rem; border-radius: 16px; border: 1px solid var(--border-light); display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; box-shadow: var(--shadow-sm); }
+.about-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4rem; align-items: start; }
+.about-profile { min-width: 0; width: 100%; max-width: 100%; box-sizing: border-box; background: #fff; padding: 3rem; border-radius: 16px; border: 1px solid var(--border-light); display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; box-shadow: var(--shadow-sm); }
 .profile-group h4 { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.5rem; }
 .profile-group p { font-size: 0.9375rem; font-weight: 500; margin: 0; }
 
@@ -360,7 +360,7 @@ ul { list-style: none; }
 
 @media (max-width: 768px) {
   .nav-actions { display: none; }
-  .main-nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: var(--bg-card); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-light); margin-top: 0.5rem; box-shadow: var(--shadow-md); }
+  .main-nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 0.5rem; box-shadow: var(--shadow-md); }
   .main-nav-links.is-open { display: flex; }
   .mobile-menu-toggle { display: block; }
   
