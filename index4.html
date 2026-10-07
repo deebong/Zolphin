@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOLPHIN | Azure Cloud Consulting & Engineering</title>
+    <meta name="description" content="Secure, scalable and production-ready Azure infrastructure designed around the workload. Azure architecture, networking, security, Terraform, DevOps, and AKS.">
+    <link rel="canonical" href="https://zolphin.com/">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+	<!-- DIAGRAM DEPENDENCIES -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            // Disabled Tailwind's container utility to prevent overriding styles.css container behaviors
+            corePlugins: { preflight: false, container: false } 
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Standalone Diagram Styles Integrated with Zolphin Theme */
+        #diagram-container {
+            position: relative; 
+            width: 100%; 
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px; 
+            background: var(--bg-main) !important;
+        }
+        #scroll-wrapper {
+            position: relative;
+            transform-origin: top left;
+        }
+        #canvas {
+            width: 1440px;
+            height: 980px;
+            background-color: transparent; 
+            position: relative;
+            transform-origin: top left;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-body);
+        }
+        #lines-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;
+        }
+        
+        /* Clean & Small Line Styling */
+        .line-path, .line-arrow-open { fill: none; stroke: #A1A9B8; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        .line-path-dashed { fill: none; stroke: #A1A9B8; stroke-width: 1.5; stroke-dasharray: 4 4; stroke-linecap: round; }
+        
+        /* Architecture Boxes matched to Zolphin Cards */
+        .arch-box, #box-vpn {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-light) !important;
+            border-radius: 12px !important; 
+            padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; position: relative; z-index: 20; transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm) !important;
+        }
+        .arch-box.rounded-full { border-radius: 9999px !important; }
+        .arch-box:hover, #box-vpn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md) !important; border-color: var(--accent) !important; }
+        
+        /* VNets */
+        .vnet-box {
+            border: 2px dashed var(--accent) !important; border-radius: 16px !important; position: relative; z-index: 15;
+            background: rgba(234, 245, 255, 0.4) !important; backdrop-filter: none !important; box-shadow: none !important;
+        }
+        .hub-vnet { 
+            border: 2px dashed #8A94A6 !important; 
+            background: rgba(247, 248, 246, 0.8) !important; 
+        }
+        
+        /* VNet Badges */
+        .vnet-badge { 
+            background: var(--bg-card) !important; border-radius: 6px !important; box-shadow: var(--shadow-sm) !important; 
+            border: 1px solid var(--border-light) !important; padding: 4px 12px !important;
+        }
+        .vnet-badge span {
+            font-family: var(--font-mono) !important; font-size: 0.75rem !important;
+            letter-spacing: 0.05em !important; text-transform: uppercase !important;
+            color: var(--text-primary) !important;
+        }
+        .vnet-badge span .text-slate-400 { color: var(--text-secondary) !important; }
+
+        /* Override Tailwind Colors to match Zolphin Theme Variables */
+        #diagram-container .text-slate-800, #diagram-container .text-slate-700 { color: var(--text-primary) !important; font-family: var(--font-body); font-weight: 600; }
+        #diagram-container .text-slate-600, #diagram-container .text-slate-500 { color: var(--text-secondary) !important; font-family: var(--font-body); }
+        #diagram-container .text-slate-400 { color: #A1A9B8 !important; font-family: var(--font-body); }
+        
+        #diagram-container .text-blue-500, #diagram-container .text-blue-400, 
+        #diagram-container .text-sky-400, #diagram-container .text-orange-400 { color: var(--accent) !important; }
+        
+        #diagram-container .bg-blue-100 { background-color: var(--accent-light) !important; }
+        #diagram-container .text-blue-600 { color: var(--accent-dark) !important; }
+        
+        #diagram-container .tracking-widest, #diagram-container .tracking-wider { 
+            font-family: var(--font-mono) !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; font-size: 0.75rem !important;
+        }
+        
+        #diagram-container .rounded-full.bg-white { 
+            background-color: var(--bg-card) !important; border: 1px solid var(--border-light) !important; box-shadow: var(--shadow-sm) !important;
+        }
+        
+        /* Custom Visible Separator */
+        .arch-separator {
+            width: 2px;
+            background-color: var(--border-light);
+            border-radius: 2px;
+        }
+
+        /* Mobile Header Fixes */
+        @media (max-width: 768px) {
+            .interactive-arch-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem;
+            }
+            .interactive-arch-title {
+                align-items: flex-start !important;
+            }
+            .interactive-arch-title::before {
+                flex-shrink: 0;
+                margin-top: 5px; /* aligns the dot perfectly with the wrapped text */
+            }
+            #open-lightbox {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <div class="nav-wrapper">
+        <nav class="main-nav" aria-label="Primary Navigation">
+            <a href="/" class="brand">
+                <div class="brand-icon"></div>
+                <div>ZOLPHIN</div>
+            </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav-links">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <ul class="main-nav-links" id="main-nav-links">
+                <li><a href="#how-we-help">How We Help</a></li>
+                <li><a href="#challenges">Challenges</a></li>
+                <li><a href="#architectures">Architectures</a></li>
+                <li><a href="#approach">Approach</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Fiverr</a>
+                <a href="#contact" class="btn btn-primary" style="padding: 0.5rem 1rem;">Start a Project</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 01 HERO -->
+    <header class="section hero reveal">
+        <div class="container hero-content">
+            <span class="eyebrow">AZURE CLOUD CONSULTING & ENGINEERING</span>
+            <h1 class="font-display">HAVE AN AZURE PROBLEM?<br>LET'S ENGINEER THE<br>RIGHT PATH.</h1>
+            <p class="subtitle">
+                Whether you are designing a new Azure environment, reviewing an existing one, migrating workloads, reducing cloud costs or improving security and reliability, Zolphin helps assess the problem, design the right architecture and implement the solution.
+            </p>
+            <div class="hero-actions">
+                <a href="#contact" class="btn btn-accent">START A CONVERSATION <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+                <a href="#how-we-help" class="btn btn-secondary">SEE HOW WE HELP</a>
+            </div>
+
+            <!-- INTERACTIVE ARCHITECTURE VISUAL -->
+            <div class="interactive-arch reveal">
+                <div class="interactive-arch-header">
+                    <div>
+                        <div class="interactive-arch-title">INTERACTIVE REFERENCE ARCHITECTURE</div>
+                        <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-secondary); margin-top: 0.25rem;">● CONCEPTUAL FLOW &nbsp;|&nbsp; NOT CONNECTED TO A LIVE AZURE ENVIRONMENT</div>
+                    </div>
+                    <div>
+                        <button id="open-lightbox" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.7rem; background: transparent;">VIEW ORIGINAL ARCHITECTURE</button>
+                    </div>
+                </div>
+                
+                <div class="interactive-arch-wrapper">
+                    <div class="mobile-swipe-hint">SWIPE TO EXPLORE ARCHITECTURE <span>→</span></div>
+                    <div class="interactive-arch-svg-container" id="diagram-container">
+                    <div id="scroll-wrapper">
+        <div id="canvas">
+            <svg id="lines-layer"></svg>
+            <div class="w-full px-48 flex-1 flex flex-col justify-start relative z-20 mt-4 pt-6">
+                <!-- Tier 1: Cloud & External -->
+                <div class="flex justify-between items-start w-full relative mb-8">
+                    <div id="box-ad" class="arch-box w-80 flex-row justify-start space-x-4">
+                        <i class="ph ph-identification-card text-4xl text-blue-500 shrink-0"></i>
+                        <div class="text-left">
+                            <div class="font-medium text-[17px] tracking-tight text-slate-800">Entra ID</div>
+                            <div class="font-normal text-[13px] text-slate-500 mt-1 leading-snug">
+                                Entra ID — authentication, workload identity and RBAC across all environments
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center space-y-10">
+                        <div id="box-internet" class="arch-box w-44 !rounded-full py-4">
+                            <i class="ph ph-cloud text-3xl text-blue-400 mb-1"></i>
+                            <div class="font-light text-[17px] tracking-tight text-slate-600">Internet</div>
+                        </div>
+                        <div id="box-firewall" class="arch-box w-52">
+                            <i class="ph ph-wall text-3xl text-orange-400 mb-1"></i>
+                            <div class="font-light text-[17px] tracking-tight text-slate-600">Azure Firewall</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center space-y-8">
+                        <div id="box-onprem" class="arch-box w-72 flex-row justify-start space-x-4">
+                            <i class="ph ph-buildings text-4xl text-slate-400"></i>
+                            <div class="text-left">
+                                <div class="font-medium text-[17px] tracking-tight text-slate-800">On-premises Network</div>
+                                <div class="text-[9px] uppercase tracking-wider font-medium text-slate-400 mt-1.5">Corp Datacenter<br>or Branch</div>
+                            </div>
+                        </div>
+                        <div id="box-vpn" class="flex flex-col items-center bg-white/60 px-5 py-3 rounded-2xl shadow-sm border border-white">
+                            <i class="ph ph-share-network text-2xl text-blue-400 mb-1"></i>
+                            <div class="font-normal text-[14px] tracking-tight text-slate-600">VPN / ExpressRoute</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tier 2: Hub VNet -->
+                <div id="box-hub" class="vnet-box hub-vnet w-full p-6 mb-24 flex flex-col items-center">
+                    <div class="absolute -top-4 left-8 vnet-badge px-4 py-1.5 flex items-center space-x-2">
+                        <i class="ph ph-arrows-left-right text-blue-500"></i>
+                        <span class="font-medium tracking-tight text-slate-700">Hub VNet <span class="text-slate-400 font-light">(Shared Services)</span></span>
+                    </div>
+                    <div class="flex justify-center items-center w-full space-x-16 mt-4">
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-3 shadow-[0_8px_16px_rgba(0,0,0,0.03)] border border-white">
+                                <i class="ph ph-globe-hemisphere-west text-3xl text-slate-500"></i>
+                            </div>
+                            <span class="text-[15px] font-normal tracking-wide text-slate-600">DNS</span>
+                        </div>
+                        
+                        <div class="arch-separator h-12"></div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-3 shadow-[0_8px_16px_rgba(0,0,0,0.03)] border border-white">
+                                <i class="ph ph-terminal-window text-3xl text-slate-500"></i>
+                            </div>
+                            <span class="text-[15px] font-normal tracking-wide text-slate-600">Bastion</span>
+                        </div>
+                        
+                        <div class="arch-separator h-12"></div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-3 shadow-[0_8px_16px_rgba(0,0,0,0.03)] border border-white">
+                                <i class="ph ph-wall text-3xl text-orange-400"></i>
+                            </div>
+                            <span class="text-[15px] font-normal tracking-wide text-slate-600">Firewall</span>
+                        </div>
+                        
+                        <div class="arch-separator h-12"></div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-3 shadow-[0_8px_16px_rgba(0,0,0,0.03)] border border-white relative">
+                                <i class="ph ph-chart-line-up text-3xl text-slate-500"></i>
+                                <div class="absolute -top-1 -right-1 bg-blue-100 text-blue-600 text-[11px] font-medium px-1.5 py-0.5 rounded-full shadow-sm">IP</div>
+                            </div>
+                            <span class="text-[15px] font-normal tracking-wide text-slate-600 text-center">Monitoring<br><span class="text-[12px] text-slate-400 font-light">(Log Analytics)</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tier 3: Spoke VNets -->
+                <div class="flex justify-between w-full space-x-8">
+                    <div id="spoke-dev" class="vnet-box flex-1 p-6 pt-8 pb-8">
+                        <div class="absolute -top-4 left-6 vnet-badge px-3 py-1 flex items-center space-x-2">
+                            <i class="ph ph-arrows-left-right text-blue-500 text-sm"></i>
+                            <span class="font-medium tracking-tight text-slate-700">Spoke VNet <span class="text-slate-400 font-light">(Dev)</span></span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 px-2">
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-app-window text-4xl text-slate-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">App Service</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-hexagon text-4xl text-blue-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">AKS</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-database text-4xl text-sky-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">Databases</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="spoke-stage" class="vnet-box flex-1 p-6 pt-8 pb-8">
+                        <div class="absolute -top-4 left-6 vnet-badge px-3 py-1 flex items-center space-x-2">
+                            <i class="ph ph-arrows-left-right text-blue-500 text-sm"></i>
+                            <span class="font-medium tracking-tight text-slate-700">Spoke VNet <span class="text-slate-400 font-light">(Stage)</span></span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 px-2">
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-app-window text-4xl text-slate-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">App Service</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-hexagon text-4xl text-blue-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">AKS</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-database text-4xl text-sky-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">Databases</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="spoke-prod" class="vnet-box flex-1 p-6 pt-8 pb-8">
+                        <div class="absolute -top-4 left-6 vnet-badge px-3 py-1 flex items-center space-x-2">
+                            <i class="ph ph-arrows-left-right text-blue-500 text-sm"></i>
+                            <span class="font-medium tracking-tight text-slate-700">Spoke VNet <span class="text-slate-400 font-light">(Prod)</span></span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 px-2">
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-app-window text-4xl text-slate-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">App Service</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-hexagon text-4xl text-blue-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">AKS</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-database text-4xl text-sky-400 mb-2"></i>
+                                <span class="text-[14px] font-light tracking-wide text-slate-600">Databases</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security & Networking Capabilities -->
+            <div class="w-[calc(100%-128px)] mx-auto mt-8 mb-12 arch-box !flex-row justify-between !items-stretch px-8 py-5 z-20">
+                <div class="flex flex-col justify-center w-1/4 pr-4 border-r-2" style="border-color: var(--border-light);">
+                    <h3 class="font-light tracking-tight text-slate-800 text-xl">Security & Networking Capabilities</h3>
+                </div>
+                <div class="flex-1 flex justify-around items-center pl-4">
+                    <div class="flex flex-col items-center text-center">
+                        <i class="ph ph-shield-check text-3xl text-slate-400 mb-2"></i>
+                        <span class="text-[14px] font-light text-slate-600 leading-snug">Network<br>Segmentation</span>
+                    </div>
+                    
+                    <div class="arch-separator h-10"></div>
+                    
+                    <div class="flex flex-col items-center text-center">
+                        <i class="ph ph-hard-drives text-3xl text-slate-400 mb-2"></i>
+                        <span class="text-[14px] font-light text-slate-600 leading-snug">Private Endpoints<br>& Private DNS</span>
+                    </div>
+                    
+                    <div class="arch-separator h-10"></div>
+                    
+                    <div class="flex flex-col items-center text-center">
+                        <i class="ph ph-shield-warning text-3xl text-slate-400 mb-2"></i>
+                        <span class="text-[14px] font-light text-slate-600 leading-snug">Threat Protection<br><span class="font-normal text-[12px] text-slate-400">(Azure Firewall)</span></span>
+                    </div>
+                    
+                    <div class="arch-separator h-10"></div>
+                    
+                    <div class="flex flex-col items-center text-center">
+                        <i class="ph ph-user-focus text-3xl text-slate-400 mb-2"></i>
+                        <span class="text-[14px] font-light text-slate-600 leading-snug">Identity &<br>Access Control</span>
+                    </div>
+                    
+                    <div class="arch-separator h-10"></div>
+                    
+                    <div class="flex flex-col items-center text-center">
+                        <i class="ph ph-eye text-3xl text-slate-400 mb-2"></i>
+                        <span class="text-[14px] font-light text-slate-600 leading-snug">Monitoring<br>& Logging</span>
+                    </div>
+                    
+                    <div class="arch-separator h-10"></div>
+                    
+                    <div class="flex flex-col items-center text-center">
+                        <i class="ph ph-gear text-3xl text-slate-400 mb-2"></i>
+                        <span class="text-[14px] font-light text-slate-600 leading-snug">Compliance<br>& Best Practices</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <script>
+            function resizeDiagramCanvas() {
+                const container = document.getElementById('diagram-container');
+                const wrapper = document.getElementById('scroll-wrapper');
+                const canvas = document.getElementById('canvas');
+                if (!container || !wrapper || !canvas) return;
+                
+                const baseWidth = 1440;
+                const baseHeight = 980;
+                
+                // Allow horizontal scroll on mobile by enforcing a minimum scale (900px min width)
+                const minScale = 900 / baseWidth;
+                const scale = Math.max(container.clientWidth / baseWidth, minScale);
+                
+                canvas.style.transform = `scale(${scale})`;
+                
+                // Set the wrapper and container dimensions to perfectly match the scaled canvas
+                const scaledWidth = baseWidth * scale;
+                const scaledHeight = baseHeight * scale;
+                
+                wrapper.style.width = `${scaledWidth}px`;
+                wrapper.style.height = `${scaledHeight}px`;
+                container.style.height = `${scaledHeight}px`;
+            }
+
+            const svgLayer = document.getElementById('lines-layer');
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            
+            // SMALLER, CLEANER ARROWS
+            defs.innerHTML = `
+                <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                    <path d="M 1 1 L 7 4 L 1 7" class="line-arrow-open" />
+                </marker>
+            `;
+
+            function getCenter(elId, canvasRect) {
+                const el = document.getElementById(elId);
+                if (!el) return {x:0, y:0, width:0};
+                const elRect = el.getBoundingClientRect();
+                return {
+                    x: elRect.left - canvasRect.left + elRect.width / 2,
+                    y: elRect.top - canvasRect.top + elRect.height / 2,
+                    width: elRect.width,
+                    height: elRect.height,
+                    top: elRect.top - canvasRect.top,
+                    bottom: elRect.bottom - canvasRect.top,
+                    left: elRect.left - canvasRect.left,
+                    right: elRect.right - canvasRect.left
+                };
+            }
+
+            function drawPath(pathString, isDashed = false) {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathString);
+                path.setAttribute('class', isDashed ? 'line-path-dashed' : 'line-path');
+                path.setAttribute('marker-end', 'url(#arrowhead)');
+                svgLayer.appendChild(path);
+            }
+
+            function renderLines() {
+                const canvas = document.getElementById('canvas');
+                if (!canvas) return;
+                
+                const originalTransform = canvas.style.transform;
+                canvas.style.transform = 'scale(1)';
+                const canvasRect = canvas.getBoundingClientRect();
+
+                svgLayer.innerHTML = '';
+                svgLayer.appendChild(defs);
+
+                const ad = getCenter('box-ad', canvasRect);
+                if (ad.width === 0) {
+                     canvas.style.transform = originalTransform;
+                     return;
+                }
+
+                const internet = getCenter('box-internet', canvasRect);
+                const firewall = getCenter('box-firewall', canvasRect);
+                const onprem = getCenter('box-onprem', canvasRect);
+                const vpn = getCenter('box-vpn', canvasRect);
+                const hub = getCenter('box-hub', canvasRect);
+                const spokeDev = getCenter('spoke-dev', canvasRect);
+                const spokeStage = getCenter('spoke-stage', canvasRect);
+                const spokeProd = getCenter('spoke-prod', canvasRect);
+
+                drawPath(`M ${internet.x} ${internet.bottom} L ${firewall.x} ${firewall.top - 5}`);
+                drawPath(`M ${onprem.x} ${onprem.bottom} L ${vpn.x} ${vpn.top - 5}`);
+                
+                // Firewall arrow perfectly straight vertically
+                drawPath(`M ${firewall.x} ${firewall.bottom} L ${firewall.x} ${hub.top - 5}`);
+
+                const forkY = hub.bottom + 48;
+                const trunkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                trunkPath.setAttribute('d', `M ${hub.x} ${hub.bottom} L ${hub.x} ${forkY}`);
+                trunkPath.setAttribute('class', 'line-path');
+                svgLayer.appendChild(trunkPath);
+                
+                drawPath(`M ${hub.x} ${forkY} L ${spokeDev.x} ${forkY} L ${spokeDev.x} ${spokeDev.top - 5}`);
+                drawPath(`M ${hub.x} ${forkY} L ${spokeStage.x} ${spokeStage.top - 5}`);
+                drawPath(`M ${hub.x} ${forkY} L ${spokeProd.x} ${forkY} L ${spokeProd.x} ${spokeProd.top - 5}`);
+
+                canvas.style.transform = originalTransform;
+            }
+
+            // Using ResizeObserver guarantees perfect rendering inside flex/grid containers
+            const diagramContainer = document.getElementById('diagram-container');
+            if (diagramContainer) {
+                const resizeObserver = new ResizeObserver(() => {
+                    resizeDiagramCanvas();
+                    renderLines();
+                });
+                resizeObserver.observe(diagramContainer);
+            }
+
+            window.addEventListener('load', () => {
+                resizeDiagramCanvas();
+                setTimeout(renderLines, 100);
+            });
+        </script>
+    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 02 HOW WE HELP (CONSULTING JOURNEY) -->
+    <section id="how-we-help" class="section reveal" style="background: #fff; border-top: 1px solid var(--border-light);">
+        <div class="container">
+            <span class="eyebrow">01 / HOW WE HELP</span>
+            <h2 class="font-display">FROM AZURE PROBLEMS TO PRACTICAL SOLUTIONS.</h2>
+            <p class="subtitle">
+                Most Azure challenges are not caused by a lack of services. They come from unclear requirements, security gaps, or organic growth. Zolphin approaches the problem in distinct stages.
+            </p>
+
+            <div class="consulting-timeline" id="timeline">
+                <div class="timeline-track">
+                    <div class="timeline-base"></div>
+                    <div class="timeline-progress" id="timeline-progress">
+    <div class="timeline-dot" style="position: absolute; right: -4px; top: -3px; width: 8px; height: 8px; background: var(--bg-card); border: 2px solid var(--accent); border-radius: 50%; opacity: 0; transition: opacity 0.3s ease;"></div>
+</div>
+                </div>
+                
+                <div class="timeline-steps">
+                    <div class="timeline-step">
+                        <div class="timeline-node" tabindex="0">
+                            <div class="node-ring"></div>
+                            <div class="node-inner">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            </div>
+                        </div>
+                        <div class="timeline-content"><div class="vertical-accent"></div>
+                            <span class="timeline-num">01</span>
+                            <h3 class="timeline-title">ASSESS</h3>
+                            <p class="timeline-subtitle">REVIEW</p>
+                            <ul class="timeline-list">
+                                <li>Architecture Health Check</li>
+                                <li>Security Review</li>
+                                <li>DevSecOps Review</li>
+                                <li>Cost & Reliability</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="timeline-node" tabindex="0">
+                            <div class="node-ring"></div>
+                            <div class="node-inner">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                        </div>
+                        <div class="timeline-content"><div class="vertical-accent"></div>
+                            <span class="timeline-num">02</span>
+                            <h3 class="timeline-title">DESIGN</h3>
+                            <p class="timeline-subtitle">DEFINE TARGET STATE</p>
+                            <ul class="timeline-list">
+                                <li>Landing Zone</li>
+                                <li>Networking & Security</li>
+                                <li>App Platform & AKS</li>
+                                <li>Migration Architecture</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="timeline-node" tabindex="0">
+                            <div class="node-ring"></div>
+                            <div class="node-inner">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                            </div>
+                        </div>
+                        <div class="timeline-content"><div class="vertical-accent"></div>
+                            <span class="timeline-num">03</span>
+                            <h3 class="timeline-title">IMPLEMENT</h3>
+                            <p class="timeline-subtitle">BUILD SOLUTION</p>
+                            <ul class="timeline-list">
+                                <li>Terraform Automation</li>
+                                <li>Azure DevOps CI/CD</li>
+                                <li>Private Networking</li>
+                                <li>Identity & Security</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="timeline-node" tabindex="0">
+                            <div class="node-ring"></div>
+                            <div class="node-inner">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            </div>
+                        </div>
+                        <div class="timeline-content"><div class="vertical-accent"></div>
+                            <span class="timeline-num">04</span>
+                            <h3 class="timeline-title">OPTIMIZE</h3>
+                            <p class="timeline-subtitle">IMPROVE EXISTING STATE</p>
+                            <ul class="timeline-list">
+                                <li>Cost Reduction</li>
+                                <li>Security Hardening</li>
+                                <li>Reliability (HA/DR)</li>
+                                <li>Operational Maturity</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 03 COMMON CHALLENGES -->
+    <section id="challenges" class="section reveal">
+        <div class="container">
+            <span class="eyebrow">COMMON AZURE CHALLENGES</span>
+            <h2 class="font-display">WHAT ARE YOU TRYING TO FIX?</h2>
+            
+            <div class="challenge-matrix reveal-stagger reveal">
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">01</span>
+                        <span class="challenge-cat">Architecture</span>
+                    </div>
+                    <p class="challenge-desc">Azure has grown without a clear architecture.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">02</span>
+                        <span class="challenge-cat">Security</span>
+                    </div>
+                    <p class="challenge-desc">We need stronger security and private connectivity.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">03</span>
+                        <span class="challenge-cat">Cost</span>
+                    </div>
+                    <p class="challenge-desc">Our cloud costs need attention.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">04</span>
+                        <span class="challenge-cat">Migration</span>
+                    </div>
+                    <p class="challenge-desc">We are moving workloads from on-premises to Azure.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">05</span>
+                        <span class="challenge-cat">DevOps</span>
+                    </div>
+                    <p class="challenge-desc">Our deployment process is manual or unreliable.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">06</span>
+                        <span class="challenge-cat">AKS</span>
+                    </div>
+                    <p class="challenge-desc">We are unsure whether we actually need Kubernetes.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">07</span>
+                        <span class="challenge-cat">HA / DR</span>
+                    </div>
+                    <p class="challenge-desc">We need a practical resilience strategy.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-header">
+                        <span class="challenge-num">08</span>
+                        <span class="challenge-cat">Review</span>
+                    </div>
+                    <p class="challenge-desc">We need an independent Azure environment review.</p>
+                    <div class="challenge-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04 REFERENCE ARCHITECTURES (3x2 CARDS) -->
+    <section id="architectures" class="section reveal" style="background: #fff; border-top: 1px solid var(--border-light);">
+        <div class="container">
+            <span class="eyebrow">03 / REFERENCE ARCHITECTURES</span>
+            <h2 class="font-display">SEE THE ARCHITECTURE BEHIND THE APPROACH.</h2>
+            <p style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-main); display: inline-block; padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid var(--border-light); margin-bottom: 2rem;">
+                <strong>REFERENCE ARCHITECTURES:</strong> These examples illustrate the Zolphin engineering approach and are not presented as client engagements.
+            </p>
+
+            <div class="ref-grid reveal-stagger reveal">
+                <!-- Card 01 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>01</span><span>APPLICATION PLATFORM</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 110">
+                            <rect x="20" y="10" width="160" height="90" rx="6" fill="var(--accent-light)" stroke="var(--accent)" stroke-dasharray="2 2" opacity="0.5"/>
+                            <rect x="40" y="25" width="120" height="25" rx="4" class="anim-node" fill="#fff" stroke="var(--border-light)"/>
+                            <rect x="40" y="65" width="50" height="25" rx="4" fill="#fff" stroke="var(--border-light)"/>
+                            <rect x="110" y="65" width="50" height="25" rx="4" fill="#fff" stroke="var(--border-light)"/>
+                            <path d="M 65 50 L 65 65 M 135 50 L 135 65" class="anim-path" stroke="var(--border-light)" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Production SaaS Platform</h3>
+                    <p class="ref-desc">A secure production foundation for SaaS workloads with controlled ingress, private data connectivity, managed identity and Terraform.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">App Gateway</span><span class="ref-tag">Azure SQL</span><span class="ref-tag">Key Vault</span>
+                    </div>
+                    <a href="case-studies/production-saas.html" class="ref-cta">EXPLORE ARCHITECTURE <span class="ref-cta-arrow">→</span></a>
+                </div>
+
+                <!-- Card 02 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>02</span><span>ENTERPRISE CLOUD</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 110">
+                            <rect x="75" y="15" width="50" height="80" rx="6" fill="#fff" stroke="var(--accent)" stroke-width="1.5"/>
+                            <rect x="25" y="35" width="40" height="40" rx="6" class="anim-node" fill="var(--accent-light)" stroke="var(--border-light)"/>
+                            <rect x="135" y="35" width="40" height="40" rx="6" class="anim-node" fill="var(--accent-light)" stroke="var(--border-light)"/>
+                            <path d="M 65 55 L 75 55 M 125 55 L 135 55" class="anim-path" stroke="var(--border-light)" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Azure Landing Zone</h3>
+                    <p class="ref-desc">A structured Azure foundation for organizations that need governance, shared connectivity, security controls and isolated environments.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">Hub & Spoke</span><span class="ref-tag">Firewall</span><span class="ref-tag">Entra ID</span>
+                    </div>
+                    <span class="ref-cta" style="opacity: 0.5;">REFERENCE ARCHITECTURE <span class="ref-cta-arrow">→</span></span>
+                </div>
+
+                <!-- Card 03 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>03</span><span>INFRASTRUCTURE AS CODE</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 110">
+                            <rect x="30" y="40" width="35" height="30" rx="4" class="anim-node" fill="#fff" stroke="var(--border-light)"/>
+                            <rect x="85" y="40" width="35" height="30" rx="4" class="anim-node" fill="#fff" stroke="var(--accent)"/>
+                            <rect x="140" y="40" width="35" height="30" rx="4" fill="var(--bg-dark)"/>
+                            <path d="M 65 55 L 85 55 M 120 55 L 140 55" class="anim-path" stroke="var(--border-light)" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Terraform + Azure DevOps</h3>
+                    <p class="ref-desc">Repeatable Azure infrastructure with reusable Terraform modules, environment separation, approvals and controlled deployments.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">Terraform</span><span class="ref-tag">CI/CD</span><span class="ref-tag">Env Controls</span>
+                    </div>
+                    <span class="ref-cta" style="opacity: 0.5;">REFERENCE ARCHITECTURE <span class="ref-cta-arrow">→</span></span>
+                </div>
+
+                <!-- Card 04 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>04</span><span>CONTAINER PLATFORM</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 110">
+                            <rect x="30" y="20" width="140" height="70" rx="6" fill="#fff" stroke="var(--border-light)"/>
+                            <rect x="40" y="35" width="120" height="40" rx="4" class="anim-node" fill="var(--accent-light)" stroke="var(--border-light)"/>
+                            <circle cx="60" cy="55" r="6" fill="#fff" stroke="var(--accent)"/>
+                            <circle cx="100" cy="55" r="6" fill="#fff" stroke="var(--accent)"/>
+                            <circle cx="140" cy="55" r="6" fill="#fff" stroke="var(--accent)"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Production AKS Architecture</h3>
+                    <p class="ref-desc">A Kubernetes-oriented Azure architecture for workloads that genuinely require advanced orchestration and networking.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">AKS</span><span class="ref-tag">VNet</span><span class="ref-tag">Managed Identity</span>
+                    </div>
+                    <span class="ref-cta" style="opacity: 0.5;">REFERENCE ARCHITECTURE <span class="ref-cta-arrow">→</span></span>
+                </div>
+
+                <!-- Card 05 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>05</span><span>CLOUD MIGRATION</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 110">
+                            <rect x="40" y="25" width="45" height="60" rx="4" class="anim-node" fill="#fff" stroke="var(--border-light)"/>
+                            <rect x="115" y="25" width="45" height="60" rx="4" class="anim-node" fill="#fff" stroke="var(--accent)"/>
+                            <path d="M 85 55 L 115 55" class="anim-path" stroke="var(--bg-dark)" stroke-width="2" stroke-dasharray="2 2" fill="none"/>
+                            <path d="M 105 45 L 115 55 L 105 65" fill="none" stroke="var(--bg-dark)" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">On-Premises to Azure</h3>
+                    <p class="ref-desc">A migration architecture covering connectivity, workload assessment, target architecture, security and operational readiness.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">ExpressRoute</span><span class="ref-tag">Migration</span><span class="ref-tag">DR</span>
+                    </div>
+                    <span class="ref-cta" style="opacity: 0.5;">REFERENCE ARCHITECTURE <span class="ref-cta-arrow">→</span></span>
+                </div>
+
+                <!-- Card 06 -->
+                <div class="ref-card">
+                    <div class="ref-header">
+                        <span>06</span><span>SECURITY & RESILIENCE</span>
+                    </div>
+                    <div class="ref-visual">
+                        <svg viewBox="0 0 200 110">
+                            <circle cx="100" cy="55" r="35" class="anim-node" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1.5"/>
+                            <circle cx="100" cy="55" r="25" fill="none" stroke="var(--accent)" stroke-width="2"/>
+                            <rect x="92" y="47" width="16" height="16" rx="2" fill="var(--bg-dark)"/>
+                            <path d="M 96 47 V 43 A 4 4 0 0 1 104 43 V 47" fill="none" stroke="var(--bg-dark)" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="ref-title">Secure & Resilient Foundation</h3>
+                    <p class="ref-desc">An architecture focused on private connectivity, identity, secrets, monitoring, backup, disaster recovery and operational resilience.</p>
+                    <div class="ref-tags">
+                        <span class="ref-tag">Key Vault</span><span class="ref-tag">Private Access</span><span class="ref-tag">RTO / RPO</span>
+                    </div>
+                    <span class="ref-cta" style="opacity: 0.5;">REFERENCE ARCHITECTURE <span class="ref-cta-arrow">→</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 05 CLIENT TOOLKIT -->
+    <section id="toolkit" class="section reveal">
+        <div class="container">
+            <span class="eyebrow">CLIENT TOOLKIT</span>
+            <h2 class="font-display">DELIVERABLES THAT HELP TEAMS MOVE FORWARD.</h2>
+            
+            <div class="toolkit-board reveal-stagger reveal">
+                <div class="toolkit-item">
+                    <div class="toolkit-header">
+                        <span class="toolkit-num">01</span>
+                        <div class="toolkit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+                    </div>
+                    <h3 class="toolkit-title">Health Check</h3>
+                    <p class="toolkit-desc">Structured findings across architecture, security, cost and operations.</p>
+                </div>
+                <div class="toolkit-item">
+                    <div class="toolkit-header">
+                        <span class="toolkit-num">02</span>
+                        <div class="toolkit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg></div>
+                    </div>
+                    <h3 class="toolkit-title">Roadmap</h3>
+                    <p class="toolkit-desc">Prioritized sequence of recommended improvements.</p>
+                </div>
+                <div class="toolkit-item">
+                    <div class="toolkit-header">
+                        <span class="toolkit-num">03</span>
+                        <div class="toolkit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+                    </div>
+                    <h3 class="toolkit-title">Decision Matrix</h3>
+                    <p class="toolkit-desc">Compare architectural options against requirements.</p>
+                </div>
+                <div class="toolkit-item">
+                    <div class="toolkit-header">
+                        <span class="toolkit-num">04</span>
+                        <div class="toolkit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+                    </div>
+                    <h3 class="toolkit-title">Security Checklist</h3>
+                    <p class="toolkit-desc">Practical security and identity review points.</p>
+                </div>
+                <div class="toolkit-item">
+                    <div class="toolkit-header">
+                        <span class="toolkit-num">05</span>
+                        <div class="toolkit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h10"/><path d="M12 2v20"/><path d="M12 12h10"/></svg></div>
+                    </div>
+                    <h3 class="toolkit-title">HA / DR Planner</h3>
+                    <p class="toolkit-desc">RTO, RPO, recovery dependencies and operational considerations.</p>
+                </div>
+                <div class="toolkit-item">
+                    <div class="toolkit-header">
+                        <span class="toolkit-num">06</span>
+                        <div class="toolkit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+                    </div>
+                    <h3 class="toolkit-title">Handover Plan</h3>
+                    <p class="toolkit-desc">Architecture documentation, implementation notes and operational guidance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 06 ENGINEERING OUTCOMES -->
+    <section class="section reveal" style="background: #fff; border-top: 1px solid var(--border-light);">
+        <div class="container">
+            <span class="eyebrow">ENGINEERING OUTCOMES</span>
+            <h2 class="font-display">WHAT THE ENGAGEMENT SHOULD DELIVER.</h2>
+            
+            <div class="outcome-matrix reveal-stagger reveal">
+                <div class="outcome-item">
+                    <div class="outcome-header"><span class="outcome-num">01</span><div class="outcome-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+                    <h3 class="outcome-title">SECURITY</h3>
+                    <p class="outcome-desc">Reduce unnecessary exposure and improve identity/access controls.</p>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-header"><span class="outcome-num">02</span><div class="outcome-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div></div>
+                    <h3 class="outcome-title">CLARITY</h3>
+                    <p class="outcome-desc">Create an architecture and roadmap the team can understand.</p>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-header"><span class="outcome-num">03</span><div class="outcome-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div></div>
+                    <h3 class="outcome-title">REPEATABILITY</h3>
+                    <p class="outcome-desc">Use Terraform and controlled deployment workflows where appropriate.</p>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-header"><span class="outcome-num">04</span><div class="outcome-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div>
+                    <h3 class="outcome-title">RELIABILITY</h3>
+                    <p class="outcome-desc">Design around failure, recovery and workload-specific RTO/RPO.</p>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-header"><span class="outcome-num">05</span><div class="outcome-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div></div>
+                    <h3 class="outcome-title">SCALABILITY</h3>
+                    <p class="outcome-desc">Build infrastructure that can evolve as the workload grows.</p>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-header"><span class="outcome-num">06</span><div class="outcome-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div></div>
+                    <h3 class="outcome-title">COST AWARENESS</h3>
+                    <p class="outcome-desc">Identify unnecessary infrastructure and make architecture decisions with cost in mind.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 07 ARCHITECTURE PHILOSOPHY -->
+    <section class="philosophy-section reveal">
+        <h2 class="philosophy-statement">THE GOAL IS NOT MAXIMUM COMPLEXITY.<br><span style="color: var(--accent);">THE GOAL IS THE RIGHT ARCHITECTURE.</span></h2>
+        <p class="philosophy-sub">We do not add Azure services simply because they are available. The architecture should solve the requirement.</p>
+    </section>
+
+    <!-- 08 HOW WE WORK -->
+    <section id="approach" class="section reveal">
+        <div class="container">
+            <span class="eyebrow">06 / WORKFLOW</span>
+            <h2 class="font-display">HOW WE WORK.</h2>
+            
+            <div class="workflow-rail reveal-stagger reveal">
+                <div class="workflow-step">
+                    <div class="workflow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+                    <span class="workflow-num">01</span>
+                    <h4 class="workflow-title">DISCOVER</h4>
+                </div>
+                <div class="workflow-connector"></div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+                    <span class="workflow-num">02</span>
+                    <h4 class="workflow-title">ASSESS</h4>
+                </div>
+                <div class="workflow-connector"></div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <span class="workflow-num">03</span>
+                    <h4 class="workflow-title">DESIGN</h4>
+                </div>
+                <div class="workflow-connector"></div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                    <span class="workflow-num">04</span>
+                    <h4 class="workflow-title">IMPLEMENT</h4>
+                </div>
+                <div class="workflow-connector"></div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="workflow-num">05</span>
+                    <h4 class="workflow-title">VALIDATE</h4>
+                </div>
+                <div class="workflow-connector"></div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+                    <span class="workflow-num">06</span>
+                    <h4 class="workflow-title">HAND OVER</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 09 ABOUT ZOLPHIN -->
+    <section id="about" class="section reveal" style="background: #fff; border-top: 1px solid var(--border-light);">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="eyebrow">ABOUT ZOLPHIN</span>
+                    <h2 class="font-display">ENGINEERING-LED.<br>AZURE-FIRST.</h2>
+                    <p class="subtitle" style="color: var(--text-primary);">
+                        Zolphin is an Azure cloud infrastructure and engineering practice focused on helping teams assess, design, implement and improve production cloud environments.
+                    </p>
+                    <p class="subtitle">
+                        Technical leadership comes from an Azure Solutions Architect with 15+ years of IT infrastructure experience.
+                    </p>
+                </div>
+                <div class="about-profile">
+                    <div class="profile-header" style="margin-bottom: 2rem;">
+                        <h3 class="font-display" style="font-size: 1.5rem; letter-spacing: 0.02em;">ENGINEERING PROFILE</h3>
+                        <p style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">AZURE / INFRASTRUCTURE / DEVOPS</p>
+                    </div>
+                    <div class="profile-group">
+                        <h4>PRIMARY FOCUS</h4>
+                        <p>Azure Infrastructure</p>
+                    </div>
+                    <div class="profile-group">
+                        <h4>ARCHITECTURE</h4>
+                        <p>Production Cloud Environments</p>
+                    </div>
+                    <div class="profile-group">
+                        <h4>AUTOMATION</h4>
+                        <p>Terraform + Azure DevOps</p>
+                    </div>
+                    <div class="profile-group">
+                        <h4>SECURITY</h4>
+                        <p>Entra ID / Managed Identity / Key Vault</p>
+                    </div>
+                    <div class="profile-group">
+                        <h4>PLATFORMS</h4>
+                        <p>App Service / Container Apps / AKS</p>
+                    </div>
+                    <div class="profile-group">
+                        <h4>EXPERIENCE</h4>
+                        <p>15+ Years Infrastructure</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10 TECHNOLOGY STACK -->
+    <section class="section reveal" style="background: #fff; padding-top: 0;">
+        <div class="container">
+            <div style="border-top: 1px solid var(--border-light); padding-top: 4rem;">
+                <h2 class="font-display" style="font-size: 2rem;">TECHNOLOGY STACK</h2>
+                
+                <div class="tech-matrix reveal-stagger reveal">
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><h4>Cloud</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Microsoft Azure</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><h4>Governance</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Azure Advisor</span><span class="tech-chip">Well-Architected</span><span class="tech-chip">Azure Policy</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><h4>Architecture</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Landing Zones</span><span class="tech-chip">VNets</span><span class="tech-chip">App Gateway</span><span class="tech-chip">Front Door</span><span class="tech-chip">Hub & Spoke</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><h4>Compute</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">App Service</span><span class="tech-chip">Container Apps</span><span class="tech-chip">AKS</span><span class="tech-chip">Virtual Machines</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg><h4>Data</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Azure SQL</span><span class="tech-chip">Azure Storage</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><h4>Security</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Entra ID</span><span class="tech-chip">Managed Identity</span><span class="tech-chip">Key Vault</span><span class="tech-chip">Private Endpoints</span><span class="tech-chip">Azure Firewall</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg><h4>Automation</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Terraform</span><span class="tech-chip">Azure DevOps</span><span class="tech-chip">CI/CD</span></div>
+                    </div>
+                    <div class="tech-category">
+                        <div class="tech-cat-header"><svg class="tech-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><h4>Observability</h4></div>
+                        <div class="tech-chips"><span class="tech-chip">Azure Monitor</span><span class="tech-chip">Log Analytics</span><span class="tech-chip">Application Insights</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11 FAQ -->
+    <section class="section reveal" style="border-top: 1px solid var(--border-light);">
+        <div class="container">
+            <div class="text-center">
+                <span class="eyebrow">07 / FAQ</span>
+                <h2 class="font-display">COMMON QUESTIONS</h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>Why Azure?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Azure provides an enterprise-grade ecosystem with excellent integrated security, identity (Entra ID), and hybrid capabilities. We focus exclusively on Azure to deliver deep, specialized architectural expertise.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>How do you choose between App Service, Container Apps and AKS?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        We default to App Service for standard web workloads. Container Apps is used for containerized workloads not requiring Kubernetes control. We only recommend AKS when the workload genuinely requires advanced orchestration and Kubernetes-native capabilities.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>Do you use Terraform?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Yes. We strongly advocate for Infrastructure as Code. We use Terraform with reusable modules to ensure environments are consistent, version-controlled, and repeatable.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>Can you work with existing Azure environments?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Yes. We frequently assess existing environments, identify architectural gaps, and implement improvements with minimal impact to active workloads.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>How do you approach disaster recovery?</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="faq-a">
+                        Disaster recovery is an architecture decision based entirely on the workload's specific RTO (Recovery Time Objective) and RPO (Recovery Point Objective) requirements.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12 CONTACT -->
+    <section id="contact" class="section reveal" style="padding-bottom: 6rem;">
+        <div class="container">
+            <div class="cta-box">
+                <span class="eyebrow">START A PROJECT</span>
+                <h2 class="font-display">HAVE AN AZURE PROBLEM TO SOLVE?</h2>
+                <p class="subtitle" style="margin: 0 auto;">
+                    Tell us what you are building, migrating, reviewing or trying to improve.<br>We can start with the current situation, the architecture and the practical next step.
+                </p>
+                <div class="cta-actions">
+                    <a href="mailto:hello@zolphin.com" class="btn btn-primary">START A CONVERSATION</a>
+                    <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">VIEW FIVERR PROFILE <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 13 FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand font-display" style="font-weight: 700; font-size: 1.5rem; letter-spacing: 0.04em;">ZOLPHIN</div>
+                    <p class="footer-desc">Azure Cloud Consulting & Engineering</p>
+                </div>
+                <div class="footer-col">
+                    <h5>Navigation</h5>
+                    <ul>
+                        <li><a href="#how-we-help">How We Help</a></li>
+                        <li><a href="#challenges">Challenges</a></li>
+                        <li><a href="#architectures">Architectures</a></li>
+                        <li><a href="#approach">Approach</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h5>Connect</h5>
+                    <ul>
+                        <li><a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer">Fiverr</a></li>
+                        <li><a href="https://in.linkedin.com/in/ganesh-prabu-39567442" target="_blank" rel="noopener noreferrer">Linkedin</a></li>
+                        <li><a href="https://github.com/ghsena" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Zolphin. All rights reserved.</p>
+                <p>Engineered for Production.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+        <div class="lightbox-overlay"></div>
+        <div class="lightbox-content">
+            <button id="close-lightbox" class="lightbox-close" aria-label="Close dialog">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="lightbox-image-container">
+                <img src="architecture.png" alt="Original Reference Architecture PNG" id="lightbox-img">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
