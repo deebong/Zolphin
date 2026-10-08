@@ -8,7 +8,7 @@
     <meta name="description" content="Reference architecture for secure and scalable Azure SaaS infrastructure using Application Gateway, private connectivity, managed identity, Terraform, Azure DevOps and Azure monitoring.">
     <link rel="canonical" href="https://zolphin.com/case-studies/production-saas.html">
     
-    <!-- Typography (Matched to index4.html) -->
+    <!-- Typography (Matched to global site) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,18 @@
     <link rel="stylesheet" href="../styles.css">
     <script src="../script.js" defer></script>
 
+    <!-- DIAGRAM DEPENDENCIES -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            // Disabled Tailwind's container utility to prevent overriding styles.css container behaviors
+            corePlugins: { preflight: false, container: false } 
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        /* Subpage-specific styling integrated with global CSS variables */
+        /* Subpage-specific article styling */
         body { background-color: var(--bg-main); }
         .article-content { padding-top: calc(var(--nav-height) + 4rem); padding-bottom: 4rem; max-width: 1140px; margin: 0 auto; }
         .back-link { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; display: inline-block; transition: color 0.2s; }
@@ -34,24 +44,6 @@
         .cs-highlight { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 1rem; border-radius: 6px; border: 1px solid rgba(0, 120, 212, 0.2); margin-top: 1rem; margin-bottom: 2rem; }
         
         .diagram-header { margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; font-weight: 600; }
-        
-        /* Responsive SVG Wrapper */
-        .svg-responsive-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border: 1px solid var(--border-light);
-            border-radius: 12px;
-            background: var(--bg-card);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 2rem;
-        }
-        .svg-responsive-wrapper svg {
-            min-width: 900px; /* Forces mobile to scroll rather than squish */
-            width: 100%;
-            height: auto;
-            display: block;
-        }
 
         .comparison-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem; }
         .comparison-card { background: var(--bg-card); border: 1px solid var(--border-light); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; }
@@ -70,11 +62,64 @@
             .comparison-grid, .tech-ecosystem { grid-template-columns: 1fr; }
             .article-content { padding-top: calc(var(--nav-height) + 2rem); }
         }
+
+        /* ==========================================================================
+           STANDARDIZED ARCHITECTURE DIAGRAM CSS FRAMEWORK 
+           (Can be moved to styles.css to apply globally across all site diagrams)
+           ========================================================================== */
+        .diagram-container {
+            position: relative; width: 100%; overflow-x: auto; overflow-y: hidden;
+            -webkit-overflow-scrolling: touch; border-radius: 12px; 
+            background: var(--bg-main) !important;
+            border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+        }
+        .diagram-scroll-wrapper { position: relative; transform-origin: top left; }
+        .diagram-canvas {
+            width: 1440px; height: 980px; background-color: transparent; 
+            position: relative; transform-origin: top left; overflow: hidden;
+            display: flex; font-family: var(--font-body);
+        }
+        .diagram-lines-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        
+        /* Line Styling Options */
+        .line-path-gray { fill: none; stroke: #A1A9B8; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        .line-path-dashed-gray { fill: none; stroke: #A1A9B8; stroke-width: 1.5; stroke-dasharray: 4 4; stroke-linecap: round; }
+        .line-path-blue { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .line-path-dashed-blue { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 6; stroke-linecap: round; }
+        
+        /* Architecture Boxes */
+        .arch-box {
+            background: var(--bg-card) !important; border: 1px solid var(--border-light) !important;
+            border-radius: 12px !important; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; position: relative; z-index: 20; transition: all 0.3s ease; box-shadow: var(--shadow-sm) !important;
+        }
+        .arch-box.rounded-full { border-radius: 9999px !important; }
+        .arch-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md) !important; border-color: var(--accent) !important; }
+        .arch-box-accent { border: 2px solid var(--accent) !important; background: var(--accent-light) !important; }
+        
+        /* VNets & Zones */
+        .vnet-box { border: 2px dashed var(--accent) !important; border-radius: 16px !important; position: relative; z-index: 15; background: rgba(234, 245, 255, 0.4) !important; }
+        .zone-box { border: 2px dashed #8A94A6 !important; border-radius: 16px !important; position: relative; z-index: 15; background: rgba(247, 248, 246, 0.8) !important; }
+        
+        /* VNet Badges */
+        .vnet-badge { 
+            background: var(--bg-card) !important; border-radius: 6px !important; box-shadow: var(--shadow-sm) !important; 
+            border: 1px solid var(--border-light) !important; padding: 4px 12px !important; display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .vnet-badge span { font-family: var(--font-mono) !important; font-size: 0.75rem !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; color: var(--text-primary) !important; font-weight: 600; }
+        .vnet-badge span .text-muted { color: var(--text-secondary) !important; font-weight: 400; }
+
+        /* Typography & Utilities for Tailwind compatibility */
+        .diag-text-primary { color: var(--text-primary) !important; font-family: var(--font-body); font-weight: 600; }
+        .diag-text-secondary { color: var(--text-secondary) !important; font-family: var(--font-body); }
+        .diag-text-accent { color: var(--accent) !important; font-family: var(--font-body); font-weight: 600; }
+        .diag-icon-accent { color: var(--accent) !important; }
+        .diag-icon-muted { color: #A1A9B8 !important; }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION (Matched to index4.html) -->
+    <!-- NAVIGATION -->
     <div class="nav-wrapper">
         <nav class="main-nav" aria-label="Primary Navigation">
             <a href="../index.html" class="brand">
@@ -100,7 +145,6 @@
 
     <main>
         <!-- BREADCRUMB & HERO -->
-        <!-- Removed 'reveal' class to fix blank page loading issue -->
         <article class="container article-content">
             <div class="case-study-hero">
                 <a href="../index.html#architectures" class="back-link">&larr; Back to Reference Architectures</a>
@@ -122,104 +166,239 @@
                 <div class="diagram-header">
                     <span class="diagram-title">Conceptual production Azure architecture</span>
                 </div>
-                <!-- Responsive SVG Wrapper -->
-                <div class="svg-responsive-wrapper">
-                    <svg viewBox="0 0 1000 700" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <pattern id="grid-cs" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border-light)" stroke-width="1"/>
-                            </pattern>
-                            <marker id="arrow-cs" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/>
-                            </marker>
-                            <marker id="arrow-grey-cs" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#A1A9B8"/>
-                            </marker>
-                        </defs>
-                        <rect width="100%" height="100%" fill="url(#grid-cs)" />
+                
+                <!-- STANDARDIZED HTML/JS DIAGRAM IMPLEMENTATION -->
+                <div class="diagram-container" id="diagram-container">
+                    <div id="scroll-wrapper" class="diagram-scroll-wrapper">
+                        <div id="canvas" class="diagram-canvas p-12">
+                            <svg id="lines-layer" class="diagram-lines-layer"></svg>
+                            
+                            <!-- LEFT: DEVOPS PIPELINE -->
+                            <div class="w-[300px] flex-shrink-0 relative z-20 mt-8">
+                                <div class="zone-box w-full h-full p-6 pb-10 flex flex-col items-center">
+                                    <div class="absolute -top-4 left-8 vnet-badge">
+                                        <i class="ph ph-git-merge diag-icon-accent text-lg"></i>
+                                        <span>DevOps <span class="text-muted">(CI/CD)</span></span>
+                                    </div>
+                                    
+                                    <div class="flex flex-col w-full mt-6">
+                                        <div class="arch-box w-full py-4" id="devops-1"><span class="diag-text-secondary text-[14px] font-semibold">1. Code & PR</span></div>
+                                        <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
+                                        
+                                        <div class="arch-box w-full py-4" id="devops-2"><span class="diag-text-secondary text-[14px] font-semibold">2. Validate</span></div>
+                                        <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
+                                        
+                                        <div class="arch-box arch-box-accent w-full py-4" id="devops-3"><span class="diag-text-accent text-[14px] font-semibold">3. Terraform Plan</span></div>
+                                        <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
+                                        
+                                        <div class="arch-box w-full py-4" id="devops-4"><span class="diag-text-secondary text-[14px] font-semibold">4. Review / Approval</span></div>
+                                        <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
+                                        
+                                        <div class="arch-box arch-box-accent w-full py-4" id="devops-apply"><span class="diag-text-accent text-[14px] font-semibold">5. Apply</span></div>
+                                        <div class="w-0.5 h-6 bg-slate-300 mx-auto"></div>
+                                        
+                                        <div class="arch-box w-full py-4" id="devops-6"><span class="diag-text-secondary text-[14px] font-semibold">6. Post-deploy Validation</span></div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- DEVOPS PIPELINE (LEFT) -->
-                        <rect x="40" y="40" width="220" height="620" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1" rx="8"/>
-                        <text x="150" y="70" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Azure DevOps + Terraform</text>
+                            <!-- RIGHT: AZURE ENVIRONMENT -->
+                            <div class="flex-1 flex flex-col items-center space-y-12 pl-24 relative z-20">
+                                
+                                <!-- Internet -->
+                                <div id="box-internet" class="arch-box w-44 rounded-full py-4">
+                                    <i class="ph ph-cloud text-4xl diag-icon-accent mb-1"></i>
+                                    <div class="diag-text-primary text-[17px]">Internet</div>
+                                </div>
+                                
+                                <!-- App Gateway -->
+                                <div id="box-agw" class="arch-box w-[550px]">
+                                    <i class="ph ph-shield-check text-4xl diag-icon-accent mb-2"></i>
+                                    <div class="diag-text-primary text-[17px]">Application Gateway + WAF</div>
+                                </div>
+                                
+                                <!-- Private Network (VNet) -->
+                                <div id="box-vnet" class="vnet-box w-[750px] p-8 pb-10 flex flex-col items-center space-y-12">
+                                    <div class="absolute -top-4 left-8 vnet-badge">
+                                        <i class="ph ph-arrows-left-right diag-icon-accent text-lg"></i>
+                                        <span>Private Network <span class="text-muted">(VNet)</span></span>
+                                    </div>
 
-                        <!-- Pipeline Steps -->
-                        <rect x="70" y="100" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
-                        <text x="150" y="125" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">1. Code &amp; PR</text>
-                        <path d="M 150 140 L 150 170" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                                    <!-- Application Workload -->
+                                    <div id="box-app" class="arch-box arch-box-accent w-full flex-row justify-center py-6 mt-4">
+                                        <div class="flex flex-col items-center">
+                                            <i class="ph ph-app-window text-4xl diag-icon-accent mb-2"></i>
+                                            <span class="diag-text-primary text-[17px]">Application Workload</span>
+                                            <span class="diag-text-secondary text-[13px] mt-1">App Service / Container Apps / AKS</span>
+                                        </div>
+                                    </div>
 
-                        <rect x="70" y="170" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
-                        <text x="150" y="195" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">2. Validate</text>
-                        <path d="M 150 210 L 150 240" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                                    <!-- Database and Secrets Row -->
+                                    <div class="flex w-full justify-between space-x-8">
+                                        <!-- Azure SQL -->
+                                        <div id="box-sql" class="arch-box flex-1 py-6">
+                                            <i class="ph ph-database text-4xl diag-icon-accent mb-2"></i>
+                                            <div class="diag-text-primary text-[17px] mb-3">Azure SQL</div>
+                                            <div class="bg-gray-100 border border-gray-200 rounded px-3 py-1.5 flex items-center gap-2">
+                                                <i class="ph ph-lock-key text-gray-500"></i>
+                                                <span class="diag-text-secondary text-[12px] font-semibold">Private Endpoint & DNS</span>
+                                            </div>
+                                        </div>
 
-                        <rect x="70" y="240" width="160" height="40" fill="#FFFFFF" stroke="var(--accent)" stroke-width="2" rx="6"/>
-                        <text x="150" y="265" fill="var(--accent)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">3. Terraform Plan</text>
-                        <path d="M 150 280 L 150 310" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                                        <!-- Key Vault -->
+                                        <div id="box-kv" class="arch-box flex-1 py-6">
+                                            <i class="ph ph-vault text-4xl diag-icon-accent mb-2"></i>
+                                            <div class="diag-text-primary text-[17px] mb-3">Key Vault</div>
+                                            <div class="bg-gray-100 border border-gray-200 rounded px-3 py-1.5 flex items-center gap-2">
+                                                <i class="ph ph-identification-card text-gray-500"></i>
+                                                <span class="diag-text-secondary text-[12px] font-semibold">Managed Identity</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <rect x="70" y="310" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
-                        <text x="150" y="335" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">4. Review / Approval</text>
-                        <path d="M 150 350 L 150 380" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
-
-                        <rect x="70" y="380" width="160" height="40" fill="#FFFFFF" stroke="var(--accent)" stroke-width="2" rx="6"/>
-                        <text x="150" y="405" fill="var(--accent)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">5. Apply</text>
-                        <path d="M 150 420 L 150 450" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
-
-                        <rect x="70" y="450" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
-                        <text x="150" y="475" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">6. Post-deploy Validation</text>
-
-                        <!-- Connect DevOps to Azure -->
-                        <path d="M 230 400 L 320 400" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-cs)"/>
-                        <text x="275" y="390" fill="var(--accent)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Deploys</text>
-
-                        <!-- AZURE ARCHITECTURE (RIGHT) -->
-                        <!-- Internet -->
-                        <text x="650" y="60" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Internet</text>
-                        <path d="M 650 70 L 650 110" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow-cs)"/>
-                        <text x="660" y="95" fill="var(--text-secondary)" font-size="10" font-weight="600" font-family="Inter">HTTPS</text>
-
-                        <!-- Gateway -->
-                        <rect x="450" y="110" width="400" height="60" fill="#FFFFFF" stroke="var(--accent)" stroke-width="2" rx="8"/>
-                        <text x="650" y="145" fill="var(--accent)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Application Gateway + WAF</text>
-                        <path d="M 650 170 L 650 210" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow-cs)"/>
-                        
-                        <!-- VNET -->
-                        <rect x="320" y="210" width="640" height="360" fill="none" stroke="var(--border-light)" stroke-width="2" stroke-dasharray="6 6" rx="12"/>
-                        <text x="340" y="235" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600">Private Network (VNet)</text>
-
-                        <!-- Application Workload -->
-                        <rect x="360" y="260" width="560" height="80" fill="var(--accent-light)" stroke="var(--accent)" stroke-width="1" rx="8"/>
-                        <text x="640" y="290" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Application Workload</text>
-                        <text x="640" y="315" fill="var(--text-secondary)" font-size="12" font-family="Inter" text-anchor="middle">App Service / Container Apps / AKS</text>
-
-                        <path d="M 480 340 L 480 390" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow-cs)"/>
-                        <path d="M 800 340 L 800 390" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-cs)"/>
-
-                        <!-- Private DB -->
-                        <rect x="360" y="390" width="240" height="100" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="8"/>
-                        <text x="480" y="420" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Azure SQL</text>
-                        <rect x="420" y="440" width="120" height="30" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1" rx="4"/>
-                        <text x="480" y="460" fill="var(--text-secondary)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Private Endpoint</text>
-                        
-                        <rect x="360" y="510" width="240" height="30" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
-                        <text x="480" y="530" fill="var(--text-secondary)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Private DNS</text>
-                        <path d="M 480 490 L 480 510" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="2 2"/>
-
-                        <!-- Security (Key Vault) -->
-                        <rect x="680" y="390" width="240" height="100" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="8"/>
-                        <text x="800" y="420" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Key Vault</text>
-                        <rect x="740" y="440" width="120" height="30" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1" rx="4"/>
-                        <text x="800" y="460" fill="var(--text-secondary)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Managed Identity</text>
-
-                        <!-- Observability -->
-                        <rect x="320" y="600" width="640" height="60" fill="#FFFFFF" stroke="var(--text-primary)" stroke-width="2" rx="8"/>
-                        <text x="640" y="625" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Observability</text>
-                        <text x="640" y="645" fill="var(--text-secondary)" font-size="12" font-family="Inter" text-anchor="middle">Azure Monitor / Log Analytics / Application Insights</text>
-
-                        <!-- Logging Lines -->
-                        <path d="M 480 540 L 480 600" stroke="#A1A9B8" stroke-width="1" stroke-dasharray="2 2"/>
-                        <path d="M 800 490 L 800 600" stroke="#A1A9B8" stroke-width="1" stroke-dasharray="2 2"/>
-                        <path d="M 940 340 L 940 600" stroke="#A1A9B8" stroke-width="1" stroke-dasharray="2 2"/>
-                    </svg>
+                                <!-- Observability -->
+                                <div id="box-obs" class="arch-box w-[750px] border-gray-400 bg-gray-50">
+                                    <div class="flex flex-col items-center">
+                                        <div class="diag-text-primary text-[17px] mb-1">Observability</div>
+                                        <div class="diag-text-secondary text-[13px]">Azure Monitor / Log Analytics / Application Insights</div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <script>
+                    function resizeSaaSDiagram() {
+                        const container = document.getElementById('diagram-container');
+                        const wrapper = document.getElementById('scroll-wrapper');
+                        const canvas = document.getElementById('canvas');
+                        if (!container || !wrapper || !canvas) return;
+                        
+                        const baseWidth = 1440;
+                        const baseHeight = 980;
+                        
+                        const minScale = 900 / baseWidth;
+                        const scale = Math.max(container.clientWidth / baseWidth, minScale);
+                        
+                        canvas.style.transform = `scale(${scale})`;
+                        
+                        const scaledWidth = baseWidth * scale;
+                        const scaledHeight = baseHeight * scale;
+                        
+                        wrapper.style.width = `${scaledWidth}px`;
+                        wrapper.style.height = `${scaledHeight}px`;
+                        container.style.height = `${scaledHeight}px`;
+                    }
+
+                    const svgLayer = document.getElementById('lines-layer');
+                    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    
+                    // Unified Clean Markers
+                    defs.innerHTML = `
+                        <marker id="arrowhead-gray" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                            <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#A1A9B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </marker>
+                        <marker id="arrowhead-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                            <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </marker>
+                    `;
+
+                    function getCenter(elId, canvasRect) {
+                        const el = document.getElementById(elId);
+                        if (!el) return {x:0, y:0, width:0};
+                        const elRect = el.getBoundingClientRect();
+                        return {
+                            x: elRect.left - canvasRect.left + elRect.width / 2,
+                            y: elRect.top - canvasRect.top + elRect.height / 2,
+                            width: elRect.width,
+                            height: elRect.height,
+                            top: elRect.top - canvasRect.top,
+                            bottom: elRect.bottom - canvasRect.top,
+                            left: elRect.left - canvasRect.left,
+                            right: elRect.right - canvasRect.left
+                        };
+                    }
+
+                    function drawLine(pathString, type = 'gray') {
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', pathString);
+                        
+                        if (type === 'blue') {
+                            path.setAttribute('class', 'line-path-blue');
+                            path.setAttribute('marker-end', 'url(#arrowhead-blue)');
+                        } else if (type === 'blue-dashed') {
+                            path.setAttribute('class', 'line-path-dashed-blue');
+                            path.setAttribute('marker-end', 'url(#arrowhead-blue)');
+                        } else if (type === 'gray-dashed') {
+                            path.setAttribute('class', 'line-path-dashed-gray');
+                            path.setAttribute('marker-end', 'url(#arrowhead-gray)');
+                        } else {
+                            path.setAttribute('class', 'line-path-gray');
+                            path.setAttribute('marker-end', 'url(#arrowhead-gray)');
+                        }
+                        svgLayer.appendChild(path);
+                    }
+
+                    function renderSaaSConnections() {
+                        const canvas = document.getElementById('canvas');
+                        if (!canvas) return;
+                        
+                        const originalTransform = canvas.style.transform;
+                        canvas.style.transform = 'scale(1)';
+                        const canvasRect = canvas.getBoundingClientRect();
+
+                        svgLayer.innerHTML = '';
+                        svgLayer.appendChild(defs);
+
+                        const internet = getCenter('box-internet', canvasRect);
+                        if (internet.width === 0) {
+                             canvas.style.transform = originalTransform;
+                             return;
+                        }
+
+                        const agw = getCenter('box-agw', canvasRect);
+                        const app = getCenter('box-app', canvasRect);
+                        const sql = getCenter('box-sql', canvasRect);
+                        const kv = getCenter('box-kv', canvasRect);
+                        const obs = getCenter('box-obs', canvasRect);
+                        const devops = getCenter('devops-apply', canvasRect);
+
+                        // Primary Traffic Routing (Solid Blue)
+                        drawLine(`M ${internet.x} ${internet.bottom} L ${agw.x} ${agw.top - 5}`, 'blue');
+                        drawLine(`M ${agw.x} ${agw.bottom} L ${app.x} ${app.top - 5}`, 'blue');
+                        
+                        // Internal VNet Connectivity (Solid Blue)
+                        drawLine(`M ${app.x - 140} ${app.bottom} L ${app.x - 140} ${sql.top - 20} L ${sql.x} ${sql.top - 20} L ${sql.x} ${sql.top - 5}`, 'blue');
+                        drawLine(`M ${app.x + 140} ${app.bottom} L ${app.x + 140} ${kv.top - 20} L ${kv.x} ${kv.top - 20} L ${kv.x} ${kv.top - 5}`, 'blue');
+
+                        // Telemetry & Logs (Dashed Gray)
+                        drawLine(`M ${app.right} ${app.y} L ${obs.right - 80} ${app.y} L ${obs.right - 80} ${obs.top - 5}`, 'gray-dashed');
+                        drawLine(`M ${sql.x} ${sql.bottom} L ${sql.x} ${obs.top - 5}`, 'gray-dashed');
+                        drawLine(`M ${kv.x} ${kv.bottom} L ${kv.x} ${obs.top - 5}`, 'gray-dashed');
+
+                        // DevOps Automation Pipeline (Dashed Blue) -> Elbow route to App Workload
+                        drawLine(`M ${devops.right} ${devops.y} L ${devops.right + 40} ${devops.y} L ${devops.right + 40} ${app.y} L ${app.left - 5} ${app.y}`, 'blue-dashed');
+
+                        canvas.style.transform = originalTransform;
+                    }
+
+                    const diagramContainerSaaS = document.getElementById('diagram-container');
+                    if (diagramContainerSaaS) {
+                        const resizeObserver = new ResizeObserver(() => {
+                            resizeSaaSDiagram();
+                            renderSaaSConnections();
+                        });
+                        resizeObserver.observe(diagramContainerSaaS);
+                    }
+
+                    window.addEventListener('load', () => {
+                        resizeSaaSDiagram();
+                        setTimeout(renderSaaSConnections, 100);
+                    });
+                </script>
             </section>
 
             <!-- ARCHITECTURAL DECISIONS -->
