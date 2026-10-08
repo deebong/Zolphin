@@ -8,47 +8,102 @@
     <meta name="description" content="Reference architecture for secure and scalable Azure SaaS infrastructure using Application Gateway, private connectivity, managed identity, Terraform, Azure DevOps and Azure monitoring.">
     <link rel="canonical" href="https://zolphin.com/case-studies/production-saas.html">
     
-    <meta property="og:title" content="Production SaaS Platform on Azure | ZOLPHIN">
-    <meta property="og:description" content="Reference architecture for secure and scalable Azure SaaS infrastructure using Application Gateway, private connectivity, managed identity, Terraform, Azure DevOps and Azure monitoring.">
-    <meta property="og:type" content="article">
-    
-    <!-- Typography -->
+    <!-- Typography (Matched to index4.html) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Assets -->
     <link rel="stylesheet" href="../styles.css">
     <script src="../script.js" defer></script>
+
+    <style>
+        /* Subpage-specific styling integrated with global CSS variables */
+        body { background-color: var(--bg-main); }
+        .article-content { padding-top: calc(var(--nav-height) + 4rem); padding-bottom: 4rem; max-width: 1140px; margin: 0 auto; }
+        .back-link { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; display: inline-block; transition: color 0.2s; }
+        .back-link:hover { color: var(--text-primary); }
+        .case-study-hero { margin-bottom: 4rem; }
+        
+        .article-section { margin-bottom: 4rem; }
+        .article-section p { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; }
+        .article-section ul { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .article-section ul li { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 0.5rem; list-style-type: disc; }
+        
+        .cs-notice { background: var(--bg-card); border: 1px solid var(--border-light); border-left: 4px solid var(--accent); padding: 1.5rem; border-radius: 8px; font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 2rem; box-shadow: var(--shadow-sm); }
+        .cs-highlight { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 1rem; border-radius: 6px; border: 1px solid rgba(0, 120, 212, 0.2); margin-top: 1rem; margin-bottom: 2rem; }
+        
+        .diagram-header { margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; font-weight: 600; }
+        
+        /* Responsive SVG Wrapper */
+        .svg-responsive-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+        .svg-responsive-wrapper svg {
+            min-width: 900px; /* Forces mobile to scroll rather than squish */
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .comparison-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem; }
+        .comparison-card { background: var(--bg-card); border: 1px solid var(--border-light); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; }
+        .comparison-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--accent); }
+        .comparison-card h4 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.5rem; letter-spacing: 0.02em; }
+        .comparison-card p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0; }
+        
+        .tech-ecosystem { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem; }
+        .tech-group h3 { font-size: 1.75rem; margin-bottom: 1rem; }
+        .tech-group ul { padding-left: 0; }
+        .tech-group ul li { list-style-type: none; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+        
+        .cs-principle { text-align: center; padding: 4rem 2rem; background: var(--bg-dark); color: var(--text-inverse); border-radius: 16px; margin: 4rem 0; font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase; }
+        
+        @media (max-width: 768px) {
+            .comparison-grid, .tech-ecosystem { grid-template-columns: 1fr; }
+            .article-content { padding-top: calc(var(--nav-height) + 2rem); }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- HEADER / NAVIGATION -->
+    <!-- NAVIGATION (Matched to index4.html) -->
     <div class="nav-wrapper">
         <nav class="main-nav" aria-label="Primary Navigation">
-            <a href="../index.html" class="brand"><div class="brand-icon"></div><div>ZOLPHIN<div class="brand-descriptor">AZURE CLOUD INFRASTRUCTURE</div></div></a>
-            <button class="mobile-menu-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav">
+            <a href="../index.html" class="brand">
+                <div class="brand-icon"></div>
+                <div>ZOLPHIN</div>
+            </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav-links">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
             <ul class="main-nav-links" id="main-nav-links">
-                 
-                    <li><a href="../index.html#services">Services</a></li>
-                    <li><a href="../index.html#case-studies">Case Studies</a></li>
-                    <li><a href="../index.html#approach">Approach</a></li>
-                    <li><a href="../index.html#about">About</a></li>
-                    <li><a href="../index.html#faq">FAQ</a></li>
-                    <li><a href="../index.html#contact">Contact</a></li>
-                 
-                <div class="nav-actions"><a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Fiverr</a><a href="../index.html#contact" class="btn btn-primary">Start a Project</a></div>
+                <li><a href="../index.html#how-we-help">How We Help</a></li>
+                <li><a href="../index.html#challenges">Challenges</a></li>
+                <li><a href="../index.html#architectures">Architectures</a></li>
+                <li><a href="../index.html#approach">Approach</a></li>
+                <li><a href="../index.html#about">About</a></li>
             </ul>
-        </div>
+            <div class="nav-actions">
+                <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Fiverr</a>
+                <a href="../index.html#contact" class="btn btn-primary" style="padding: 0.5rem 1rem;">Start a Project</a>
+            </div>
+        </nav>
     </div>
 
     <main>
         <!-- BREADCRUMB & HERO -->
+        <!-- Removed 'reveal' class to fix blank page loading issue -->
         <article class="container article-content">
             <div class="case-study-hero">
-                <a href="../index.html#case-studies" class="back-link">&larr; Back to Reference Architectures</a>
+                <a href="../index.html#architectures" class="back-link">&larr; Back to Reference Architectures</a>
                 <span class="eyebrow">REFERENCE ARCHITECTURE</span>
                 <h1 class="font-display">Production SaaS Platform on Azure</h1>
                 <p class="subtitle">Secure, scalable and operationally manageable Azure infrastructure for a production SaaS workload.</p>
@@ -67,101 +122,104 @@
                 <div class="diagram-header">
                     <span class="diagram-title">Conceptual production Azure architecture</span>
                 </div>
-                <svg viewBox="0 0 1000 700" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; border: 1px solid rgba(16,20,27,0.08); border-radius: 12px; background: #F7F8F6;">
-                    <defs>
-                        <pattern id="grid-cs" width="40" height="40" patternUnits="userSpaceOnUse">
-                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F7F8F6" stroke-width="1"/>
-                        </pattern>
-                        <marker id="arrow-cs" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#4DA3FF"/>
-                        </marker>
-                        <marker id="arrow-grey-cs" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(16,20,27,0.08)"/>
-                        </marker>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid-cs)" />
+                <!-- Responsive SVG Wrapper -->
+                <div class="svg-responsive-wrapper">
+                    <svg viewBox="0 0 1000 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <pattern id="grid-cs" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border-light)" stroke-width="1"/>
+                            </pattern>
+                            <marker id="arrow-cs" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/>
+                            </marker>
+                            <marker id="arrow-grey-cs" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#A1A9B8"/>
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid-cs)" />
 
-                    <!-- DEVOPS PIPELINE (LEFT) -->
-                    <rect x="40" y="40" width="220" height="620" fill="#F7F8F6" stroke="rgba(16,20,27,0.08)" stroke-width="1"/>
-                    <text x="150" y="70" fill="#10141B" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Azure DevOps + Terraform</text>
+                        <!-- DEVOPS PIPELINE (LEFT) -->
+                        <rect x="40" y="40" width="220" height="620" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1" rx="8"/>
+                        <text x="150" y="70" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Azure DevOps + Terraform</text>
 
-                    <!-- Pipeline Steps -->
-                    <rect x="70" y="100" width="160" height="40" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="150" y="125" fill="#5F6672" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">1. Code &amp; PR</text>
-                    <path d="M 150 140 L 150 170" stroke="rgba(16,20,27,0.08)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                        <!-- Pipeline Steps -->
+                        <rect x="70" y="100" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
+                        <text x="150" y="125" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">1. Code &amp; PR</text>
+                        <path d="M 150 140 L 150 170" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
 
-                    <rect x="70" y="170" width="160" height="40" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="150" y="195" fill="#5F6672" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">2. Validate</text>
-                    <path d="M 150 210 L 150 240" stroke="rgba(16,20,27,0.08)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                        <rect x="70" y="170" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
+                        <text x="150" y="195" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">2. Validate</text>
+                        <path d="M 150 210 L 150 240" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
 
-                    <rect x="70" y="240" width="160" height="40" fill="#FFFFFF" stroke="#4DA3FF" stroke-width="2"/>
-                    <text x="150" y="265" fill="#4DA3FF" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">3. Terraform Plan</text>
-                    <path d="M 150 280 L 150 310" stroke="rgba(16,20,27,0.08)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                        <rect x="70" y="240" width="160" height="40" fill="#FFFFFF" stroke="var(--accent)" stroke-width="2" rx="6"/>
+                        <text x="150" y="265" fill="var(--accent)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">3. Terraform Plan</text>
+                        <path d="M 150 280 L 150 310" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
 
-                    <rect x="70" y="310" width="160" height="40" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="150" y="335" fill="#5F6672" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">4. Review / Approval</text>
-                    <path d="M 150 350 L 150 380" stroke="rgba(16,20,27,0.08)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                        <rect x="70" y="310" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
+                        <text x="150" y="335" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">4. Review / Approval</text>
+                        <path d="M 150 350 L 150 380" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
 
-                    <rect x="70" y="380" width="160" height="40" fill="#FFFFFF" stroke="#4DA3FF" stroke-width="2"/>
-                    <text x="150" y="405" fill="#4DA3FF" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">5. Apply</text>
-                    <path d="M 150 420 L 150 450" stroke="rgba(16,20,27,0.08)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
+                        <rect x="70" y="380" width="160" height="40" fill="#FFFFFF" stroke="var(--accent)" stroke-width="2" rx="6"/>
+                        <text x="150" y="405" fill="var(--accent)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">5. Apply</text>
+                        <path d="M 150 420 L 150 450" stroke="var(--border-light)" stroke-width="2" marker-end="url(#arrow-grey-cs)"/>
 
-                    <rect x="70" y="450" width="160" height="40" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="150" y="475" fill="#5F6672" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">6. Post-deploy Validation</text>
+                        <rect x="70" y="450" width="160" height="40" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
+                        <text x="150" y="475" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600" text-anchor="middle">6. Post-deploy Validation</text>
 
-                    <!-- Connect DevOps to Azure -->
-                    <path d="M 230 400 L 320 400" stroke="#4DA3FF" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-cs)"/>
-                    <text x="275" y="390" fill="#4DA3FF" font-size="10" font-family="Inter" text-anchor="middle">Deploys</text>
+                        <!-- Connect DevOps to Azure -->
+                        <path d="M 230 400 L 320 400" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-cs)"/>
+                        <text x="275" y="390" fill="var(--accent)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Deploys</text>
 
-                    <!-- AZURE ARCHITECTURE (RIGHT) -->
-                    <!-- Internet -->
-                    <text x="650" y="60" fill="#10141B" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Internet</text>
-                    <path d="M 650 70 L 650 110" stroke="#4DA3FF" stroke-width="2" marker-end="url(#arrow-cs)"/>
-                    <text x="660" y="95" fill="#5F6672" font-size="10" font-family="Inter">HTTPS</text>
+                        <!-- AZURE ARCHITECTURE (RIGHT) -->
+                        <!-- Internet -->
+                        <text x="650" y="60" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Internet</text>
+                        <path d="M 650 70 L 650 110" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow-cs)"/>
+                        <text x="660" y="95" fill="var(--text-secondary)" font-size="10" font-weight="600" font-family="Inter">HTTPS</text>
 
-                    <!-- Gateway -->
-                    <rect x="450" y="110" width="400" height="60" fill="#FFFFFF" stroke="#4DA3FF" stroke-width="2"/>
-                    <text x="650" y="145" fill="#4DA3FF" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Application Gateway + WAF</text>
-                    <path d="M 650 170 L 650 210" stroke="#4DA3FF" stroke-width="2" marker-end="url(#arrow-cs)"/>
-                    
-                    <!-- VNET -->
-                    <rect x="320" y="210" width="640" height="360" fill="none" stroke="rgba(16,20,27,0.08)" stroke-width="2" stroke-dasharray="6 6"/>
-                    <text x="340" y="235" fill="#5F6672" font-size="12" font-family="Inter" font-weight="600">Private Network (VNet)</text>
+                        <!-- Gateway -->
+                        <rect x="450" y="110" width="400" height="60" fill="#FFFFFF" stroke="var(--accent)" stroke-width="2" rx="8"/>
+                        <text x="650" y="145" fill="var(--accent)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Application Gateway + WAF</text>
+                        <path d="M 650 170 L 650 210" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow-cs)"/>
+                        
+                        <!-- VNET -->
+                        <rect x="320" y="210" width="640" height="360" fill="none" stroke="var(--border-light)" stroke-width="2" stroke-dasharray="6 6" rx="12"/>
+                        <text x="340" y="235" fill="var(--text-secondary)" font-size="12" font-family="Inter" font-weight="600">Private Network (VNet)</text>
 
-                    <!-- Application Workload -->
-                    <rect x="360" y="260" width="560" height="80" fill="#EAF5FF" stroke="#4DA3FF" stroke-width="1"/>
-                    <text x="640" y="290" fill="#10141B" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Application Workload</text>
-                    <text x="640" y="315" fill="#5F6672" font-size="12" font-family="Inter" text-anchor="middle">App Service / Container Apps / AKS</text>
+                        <!-- Application Workload -->
+                        <rect x="360" y="260" width="560" height="80" fill="var(--accent-light)" stroke="var(--accent)" stroke-width="1" rx="8"/>
+                        <text x="640" y="290" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Application Workload</text>
+                        <text x="640" y="315" fill="var(--text-secondary)" font-size="12" font-family="Inter" text-anchor="middle">App Service / Container Apps / AKS</text>
 
-                    <path d="M 480 340 L 480 390" stroke="#4DA3FF" stroke-width="2" marker-end="url(#arrow-cs)"/>
-                    <path d="M 800 340 L 800 390" stroke="#4DA3FF" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-cs)"/>
+                        <path d="M 480 340 L 480 390" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow-cs)"/>
+                        <path d="M 800 340 L 800 390" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-cs)"/>
 
-                    <!-- Private DB -->
-                    <rect x="360" y="390" width="240" height="100" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="480" y="420" fill="#10141B" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Azure SQL</text>
-                    <rect x="420" y="440" width="120" height="30" fill="#F7F8F6" stroke="rgba(16,20,27,0.08)" stroke-width="1"/>
-                    <text x="480" y="460" fill="#5F6672" font-size="10" font-family="Inter" text-anchor="middle">Private Endpoint</text>
-                    
-                    <rect x="360" y="510" width="240" height="30" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="480" y="530" fill="#5F6672" font-size="10" font-family="Inter" text-anchor="middle">Private DNS</text>
-                    <path d="M 480 490 L 480 510" stroke="rgba(16,20,27,0.08)" stroke-width="1" stroke-dasharray="2 2"/>
+                        <!-- Private DB -->
+                        <rect x="360" y="390" width="240" height="100" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="8"/>
+                        <text x="480" y="420" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Azure SQL</text>
+                        <rect x="420" y="440" width="120" height="30" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1" rx="4"/>
+                        <text x="480" y="460" fill="var(--text-secondary)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Private Endpoint</text>
+                        
+                        <rect x="360" y="510" width="240" height="30" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="6"/>
+                        <text x="480" y="530" fill="var(--text-secondary)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Private DNS</text>
+                        <path d="M 480 490 L 480 510" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="2 2"/>
 
-                    <!-- Security (Key Vault) -->
-                    <rect x="680" y="390" width="240" height="100" fill="#FFFFFF" stroke="rgba(16,20,27,0.08)" stroke-width="2"/>
-                    <text x="800" y="420" fill="#10141B" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Key Vault</text>
-                    <rect x="740" y="440" width="120" height="30" fill="#F7F8F6" stroke="rgba(16,20,27,0.08)" stroke-width="1"/>
-                    <text x="800" y="460" fill="#5F6672" font-size="10" font-family="Inter" text-anchor="middle">Managed Identity</text>
+                        <!-- Security (Key Vault) -->
+                        <rect x="680" y="390" width="240" height="100" fill="#FFFFFF" stroke="var(--border-light)" stroke-width="2" rx="8"/>
+                        <text x="800" y="420" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Key Vault</text>
+                        <rect x="740" y="440" width="120" height="30" fill="var(--bg-main)" stroke="var(--border-light)" stroke-width="1" rx="4"/>
+                        <text x="800" y="460" fill="var(--text-secondary)" font-size="10" font-family="Inter" font-weight="600" text-anchor="middle">Managed Identity</text>
 
-                    <!-- Observability -->
-                    <rect x="320" y="600" width="640" height="60" fill="#FFFFFF" stroke="#10141B" stroke-width="2"/>
-                    <text x="640" y="625" fill="#10141B" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Observability</text>
-                    <text x="640" y="645" fill="#5F6672" font-size="12" font-family="Inter" text-anchor="middle">Azure Monitor / Log Analytics / Application Insights</text>
+                        <!-- Observability -->
+                        <rect x="320" y="600" width="640" height="60" fill="#FFFFFF" stroke="var(--text-primary)" stroke-width="2" rx="8"/>
+                        <text x="640" y="625" fill="var(--text-primary)" font-size="14" font-family="Inter" font-weight="600" text-anchor="middle">Observability</text>
+                        <text x="640" y="645" fill="var(--text-secondary)" font-size="12" font-family="Inter" text-anchor="middle">Azure Monitor / Log Analytics / Application Insights</text>
 
-                    <!-- Logging Lines -->
-                    <path d="M 480 540 L 480 600" stroke="#10141B" stroke-width="1" stroke-dasharray="2 2"/>
-                    <path d="M 800 490 L 800 600" stroke="#10141B" stroke-width="1" stroke-dasharray="2 2"/>
-                    <path d="M 940 340 L 940 600" stroke="#10141B" stroke-width="1" stroke-dasharray="2 2"/>
-                </svg>
+                        <!-- Logging Lines -->
+                        <path d="M 480 540 L 480 600" stroke="#A1A9B8" stroke-width="1" stroke-dasharray="2 2"/>
+                        <path d="M 800 490 L 800 600" stroke="#A1A9B8" stroke-width="1" stroke-dasharray="2 2"/>
+                        <path d="M 940 340 L 940 600" stroke="#A1A9B8" stroke-width="1" stroke-dasharray="2 2"/>
+                    </svg>
+                </div>
             </section>
 
             <!-- ARCHITECTURAL DECISIONS -->
@@ -199,12 +257,12 @@
                     <li>private endpoints</li>
                     <li>monitoring</li>
                     <li>supporting resources</li>
-                 
+                </ul>
                 <p>Reusable modules and workspace configurations ensure environment separation across Dev, Stage/UAT, and Production.</p>
 
                 <h3 class="font-display">Decision 06: CI/CD</h3>
                 <p>Azure DevOps acts as the orchestrator for infrastructure state and application delivery. The pipeline strictly enforces the deployment process:</p>
-                <p class="mt-2" style="font-weight: 500; color: var(--azure-blue);">Code &rarr; PR &rarr; Validate &rarr; Terraform Plan &rarr; Review / Approval &rarr; Apply &rarr; Post-deployment Validation</p>
+                <p class="mt-2" style="font-weight: 500; color: var(--accent);">Code &rarr; PR &rarr; Validate &rarr; Terraform Plan &rarr; Review / Approval &rarr; Apply &rarr; Post-deployment Validation</p>
 
                 <h3 class="font-display">Decision 07: Observability</h3>
                 <p>The environment relies on Azure Monitor, Log Analytics, Application Insights, Diagnostic Settings, Alerts, and Dashboards.</p>
@@ -249,12 +307,12 @@
                     <li>Key Vault/secrets dependencies</li>
                     <li>runbooks</li>
                     <li>regular DR testing</li>
-                 
+                </ul>
                 <div class="cs-notice">Terraform can help recreate infrastructure consistently in the recovery region.</div>
             </section>
 
             <!-- ENGINEERING RESTRAINT -->
-            <section class="article-section section-alt" style="padding: 3rem; border-radius: 8px;">
+            <section class="article-section section-alt" style="padding: 3rem; border-radius: 12px; background: #fff; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);">
                 <h2 class="font-display">Engineering restraint matters</h2>
                 <p>Not every production workload needs every Azure service. Unnecessary complexity introduces operational risk.</p>
                 <ul>
@@ -265,8 +323,8 @@
                     <li>excessive subnetting</li>
                     <li>multiple gateways/load balancers without a traffic requirement</li>
                     <li>complex Terraform module structures for small deployments</li>
-                 
-                <div class="cs-highlight" style="background: #F7F8F6; margin-bottom: 0;">The architecture should solve the requirement&mdash;not maximize the number of Azure services.</div>
+                </ul>
+                <div class="cs-highlight" style="margin-bottom: 0;">The architecture should solve the requirement&mdash;not maximize the number of Azure services.</div>
             </section>
 
             <!-- SCALING -->
@@ -280,7 +338,7 @@
             <!-- TECHNOLOGY -->
             <section class="article-section">
                 <h2 class="font-display">Technology</h2>
-                <div class="tech-ecosystem" style="gap: 3rem;">
+                <div class="tech-ecosystem">
                     <div class="tech-group">
                         <h3 class="font-display">Core Platform</h3>
                         <ul>
@@ -288,7 +346,7 @@
                             <li>Application Gateway</li>
                             <li>WAF</li>
                             <li>App Service / Container Apps / AKS</li>
-                         
+                        </ul>
                     </div>
                     <div class="tech-group">
                         <h3 class="font-display">Data &amp; Security</h3>
@@ -297,7 +355,7 @@
                             <li>Private Endpoint &amp; DNS</li>
                             <li>Key Vault</li>
                             <li>Managed Identity / Entra ID</li>
-                         
+                        </ul>
                     </div>
                     <div class="tech-group">
                         <h3 class="font-display">Operations</h3>
@@ -306,7 +364,7 @@
                             <li>Azure DevOps</li>
                             <li>Azure Monitor &amp; Log Analytics</li>
                             <li>Application Insights</li>
-                         
+                        </ul>
                     </div>
                 </div>
             </section>
@@ -320,48 +378,41 @@
         <!-- CONTACT CTA -->
         <section class="section">
             <div class="container cta-box">
+                <span class="eyebrow">START A PROJECT</span>
                 <h2 class="font-display">Planning an Azure project?</h2>
-                <p class="subtitle">Share your current environment, application requirements or infrastructure challenge.</p>
+                <p class="subtitle" style="margin: 0 auto;">Share your current environment, application requirements or infrastructure challenge.</p>
                 <div class="cta-actions">
                     <a href="mailto:hello@zolphin.com" class="btn btn-primary">START A CONVERSATION</a>
-                    <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">VIEW FIVERR PROFILE</a>
+                    <a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">VIEW FIVERR PROFILE <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg></a>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- FOOTER -->
-    </footer>
-
-</body>
-</html>
-    <!-- 12 FOOTER -->
+    <!-- FOOTER (Matched to index4.html) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div>
-                    <div class="footer-brand">ZOLPHIN</div>
-                    <p class="footer-desc">Azure Cloud Infrastructure & Engineering</p>
+                    <div class="footer-brand font-display" style="font-weight: 700; font-size: 1.5rem; letter-spacing: 0.04em;">ZOLPHIN</div>
+                    <p class="footer-desc">Azure Cloud Consulting & Engineering</p>
                 </div>
                 <div class="footer-col">
                     <h5>Navigation</h5>
                     <ul>
-                        <li><a href="../index.html#services">Services</a></li>
+                        <li><a href="../index.html#how-we-help">How We Help</a></li>
+                        <li><a href="../index.html#challenges">Challenges</a></li>
                         <li><a href="../index.html#architectures">Architectures</a></li>
                         <li><a href="../index.html#approach">Approach</a></li>
                         <li><a href="../index.html#about">About</a></li>
-                        <li><a href="../index.html#faq">FAQ</a></li>
-                        <li><a href="../index.html#contact">Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h5>Connect</h5>
                     <ul>
                         <li><a href="https://www.fiverr.com/cloudganesh" target="_blank" rel="noopener noreferrer">Fiverr</a></li>
-                        <!-- Placeholders -->
-                        <li><a href="https://github.com/">GitHub</a></li>
-                        <li><a href="https://linkedin.com/">LinkedIn</a></li>
+                        <li><a href="https://in.linkedin.com/in/ganesh-prabu-39567442" target="_blank" rel="noopener noreferrer">Linkedin</a></li>
+                        <li><a href="https://github.com/ghsena" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                     </ul>
                 </div>
             </div>
